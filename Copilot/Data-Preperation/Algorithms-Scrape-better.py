@@ -1,5 +1,13 @@
 import os
 
+"""
+This will need to be configured for the language you want to scrape!!!
+Algorithms can be found here: https://github.com/TheAlgorithms
+
+TODO:
+Merge this with data-preperation
+"""
+
 directories = os.listdir(path = None)
 fixFolders = []
 for item in directories:
