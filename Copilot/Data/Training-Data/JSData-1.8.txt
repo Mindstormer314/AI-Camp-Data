@@ -1,0 +1,9119 @@
+const CHAR_SIZE = 8
+
+
+function pad (str, bits) {
+  let res = str
+  while (res.length % bits !== 0) {
+    res = '0' + res
+  }
+  return res
+}
+
+
+function chunkify (str, size) {
+  const chunks = []
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.slice(i, i + size))
+  }
+  return chunks
+}
+
+
+function rotateLeft (bits, turns) {
+  return bits.substr(turns) + bits.substr(0, turns)
+}
+
+
+function preProcess (message) {
+      let m = message.split('')
+    .map(e => e.charCodeAt(0))
+    .map(e => e.toString(2))
+    .map(e => pad(e, 8))
+    .join('') + '1'
+
+    while (m.length % 512 !== 448) {
+    m += '0'
+  }
+
+      let ml = (message.length * CHAR_SIZE).toString(2)
+  ml = pad(ml, 8)
+  ml = '0'.repeat(64 - ml.length) + ml
+
+  return m + ml
+}
+
+
+function SHA1 (message) {
+    let H0 = 0x67452301
+  let H1 = 0xEFCDAB89
+  let H2 = 0x98BADCFE
+  let H3 = 0x10325476
+  let H4 = 0xC3D2E1F0
+
+    const bits = preProcess(message)
+  const chunks = chunkify(bits, 512)
+
+  chunks.forEach(function (chunk, i) {
+        const words = chunkify(chunk, 32)
+
+        for (let i = 16; i < 80; i++) {
+      const val = [words[i - 3], words[i - 8], words[i - 14], words[i - 16]]
+        .map(e => parseInt(e, 2))
+        .reduce((acc, curr) => curr ^ acc, 0)
+      const bin = (val >>> 0).toString(2)
+      const paddedBin = pad(bin, 32)
+      const word = rotateLeft(paddedBin, 1)
+      words.push(word)
+    }
+
+        let [a, b, c, d, e] = [H0, H1, H2, H3, H4]
+
+    for (let i = 0; i < 80; i++) {
+      let f, k
+      if (i < 20) {
+        f = (b & c) | (~b & d)
+        k = 0x5A827999
+      } else if (i < 40) {
+        f = b ^ c ^ d
+        k = 0x6ED9EBA1
+      } else if (i < 60) {
+        f = (b & c) | (b & d) | (c & d)
+        k = 0x8F1BBCDC
+      } else {
+        f = b ^ c ^ d
+        k = 0xCA62C1D6
+      }
+            f >>>= 0
+
+      const aRot = rotateLeft(pad(a.toString(2), 32), 5)
+      const aInt = parseInt(aRot, 2) >>> 0
+      const wordInt = parseInt(words[i], 2) >>> 0
+      const t = aInt + f + e + k + wordInt
+      e = d >>> 0
+      d = c >>> 0
+      const bRot = rotateLeft(pad(b.toString(2), 32), 30)
+      c = parseInt(bRot, 2) >>> 0
+      b = a >>> 0
+      a = t >>> 0
+    }
+
+        H0 = (H0 + a) >>> 0
+    H1 = (H1 + b) >>> 0
+    H2 = (H2 + c) >>> 0
+    H3 = (H3 + d) >>> 0
+    H4 = (H4 + e) >>> 0
+  })
+
+    const HH = [H0, H1, H2, H3, H4]
+    .map(e => e.toString(16))
+    .map(e => pad(e, 8))
+    .join('')
+
+  return HH
+}
+
+
+
+const CHAR_SIZE = 8
+
+const K = [
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
+]
+
+
+function pad (str, bits) {
+  let res = str
+  while (res.length % bits !== 0) {
+    res = '0' + res
+  }
+  return res
+}
+
+
+function chunkify (str, size) {
+  const chunks = []
+  for (let i = 0; i < str.length; i += size) {
+    chunks.push(str.slice(i, i + size))
+  }
+  return chunks
+}
+
+
+function rotateRight (bits, turns) {
+  return bits.substr(bits.length - turns) + bits.substr(0, bits.length - turns)
+}
+
+
+function preProcess (message) {
+      let m = message.split('')
+    .map(e => e.charCodeAt(0))
+    .map(e => e.toString(2))
+    .map(e => pad(e, 8))
+    .join('') + '1'
+
+    while (m.length % 512 !== 448) {
+    m += '0'
+  }
+
+      let ml = (message.length * CHAR_SIZE).toString(2)
+  ml = pad(ml, 8)
+  ml = '0'.repeat(64 - ml.length) + ml
+
+  return m + ml
+}
+
+
+function SHA256 (message) {
+    let H0 = 0x6a09e667
+  let H1 = 0xbb67ae85
+  let H2 = 0x3c6ef372
+  let H3 = 0xa54ff53a
+  let H4 = 0x510e527f
+  let H5 = 0x9b05688c
+  let H6 = 0x1f83d9ab
+  let H7 = 0x5be0cd19
+
+    const bits = preProcess(message)
+  const chunks = chunkify(bits, 512)
+
+  chunks.forEach(function (chunk, i) {
+        const words = chunkify(chunk, 32)
+
+        for (let i = 16; i < 64; i++) {
+      const W1 = words[i - 15]
+      const W2 = words[i - 2]
+      const R1 = rotateRight(W1, 7)
+      const R2 = rotateRight(W1, 18)
+      const R3 = rotateRight(W2, 17)
+      const R4 = rotateRight(W2, 19)
+      const S0 = parseInt(R1, 2) ^ parseInt(R2, 2) ^ (parseInt(W1, 2) >>> 3)
+      const S1 = parseInt(R3, 2) ^ parseInt(R4, 2) ^ (parseInt(W2, 2) >>> 10)
+      const val = parseInt(words[i - 16], 2) + S0 + parseInt(words[i - 7], 2) + S1
+      words[i] = pad((val >>> 0).toString(2), 32)
+    }
+
+        let [a, b, c, d, e, f, g, h] = [H0, H1, H2, H3, H4, H5, H6, H7]
+
+    for (let i = 0; i < 64; i++) {
+      const S1 = [6, 11, 25]
+        .map(turns => rotateRight(pad(e.toString(2), 32), turns))
+        .map(bitstring => parseInt(bitstring, 2))
+        .reduce((acc, curr) => acc ^ curr, 0) >>> 0
+      const CH = ((e & f) ^ (~e & g)) >>> 0
+      const temp1 = (h + S1 + CH + K[i] + parseInt(words[i], 2)) >>> 0
+      const S0 = [2, 13, 22]
+        .map(turns => rotateRight(pad(a.toString(2), 32), turns))
+        .map(bitstring => parseInt(bitstring, 2))
+        .reduce((acc, curr) => acc ^ curr, 0) >>> 0
+      const maj = ((a & b) ^ (a & c) ^ (b & c)) >>> 0
+      const temp2 = (S0 + maj) >>> 0
+
+      h = g
+      g = f
+      f = e
+      e = (d + temp1) >>> 0
+      d = c
+      c = b
+      b = a
+      a = (temp1 + temp2) >>> 0
+    }
+
+        H0 = (H0 + a) >>> 0
+    H1 = (H1 + b) >>> 0
+    H2 = (H2 + c) >>> 0
+    H3 = (H3 + d) >>> 0
+    H4 = (H4 + e) >>> 0
+    H5 = (H5 + f) >>> 0
+    H6 = (H6 + g) >>> 0
+    H7 = (H7 + h) >>> 0
+  })
+
+    const HH = [H0, H1, H2, H3, H4, H5, H6, H7]
+    .map(e => e.toString(16))
+    .map(e => pad(e, 8))
+    .join('')
+
+  return HH
+}
+
+
+
+'use strict'
+
+
+let utils;
+(function (_utils) {
+  function comparator () {
+    return function (v1, v2) {
+      if (v1 < v2) return -1
+      if (v2 < v1) return 1
+      return 0
+    }
+  }
+  _utils.comparator = comparator
+})(utils || (utils = {}))
+
+
+const AVLTree = (function () {
+  function _avl (comp) {
+    /
+    this._comp = undefined
+    this._comp = comp !== undefined ? comp : utils.comparator()
+
+    /
+    this.root = null
+    /
+    this.size = 0
+  }
+
+    const Node = function (val) {
+    this._val = val
+    this._left = null
+    this._right = null
+    this._height = 1
+  }
+
+    const getHeight = function (node) {
+    if (node == null) { return 0 }
+    return node._height
+  }
+
+    const getHeightDifference = function (node) {
+    return node == null ? 0 : getHeight(node._left) - getHeight(node._right)
+  }
+
+    const updateHeight = function (node) {
+    if (node == null) { return }
+    node._height = Math.max(getHeight(node._left), getHeight(node._right)) + 1
+  }
+
+    const isValidBalanceFactor = (balanceFactor) => [0, 1, -1].includes(balanceFactor)
+
+    const leftRotate = function (node) {
+    const temp = node._right
+    node._right = temp._left
+    temp._left = node
+    updateHeight(node)
+    updateHeight(temp)
+    return temp
+  }
+  const rightRotate = function (node) {
+    const temp = node._left
+    node._left = temp._right
+    temp._right = node
+    updateHeight(node)
+    updateHeight(temp)
+    return temp
+  }
+
+    const insertBalance = function (node, _val, balanceFactor) {
+    if (balanceFactor > 1 && _val < node._left._val) {
+      return rightRotate(node)     }
+    if (balanceFactor < 1 && _val > node._right._val) {
+      return leftRotate(node)     }
+    if (balanceFactor > 1 && _val > node._left._val) {
+      node._left = leftRotate(node._left)       return rightRotate(node)
+    }
+    node._right = rightRotate(node._right)
+    return leftRotate(node)
+  }
+
+    const delBalance = function (node) {
+    const balanceFactor1 = getHeightDifference(node)
+    if (isValidBalanceFactor(balanceFactor1)) {
+      return node
+    }
+    if (balanceFactor1 > 1) {
+      if (getHeightDifference(node._left) >= 0) {
+        return rightRotate(node)       }
+      node._left = leftRotate(node._left)
+      return rightRotate(node)     }
+    if (getHeightDifference(node._right) > 0) {
+      node._right = rightRotate(node._right)
+      return leftRotate(node)     }
+    return leftRotate(node)   }
+
+    const insert = function (root, val, tree) {
+    if (root == null) {
+      tree.size++
+      return new Node(val)
+    }
+    if (tree._comp(root._val, val) < 0) {
+      root._right = insert(root._right, val, tree)
+    } else if (tree._comp(root._val, val) > 0) {
+      root._left = insert(root._left, val, tree)
+    } else {
+      return root
+    }
+    updateHeight(root)
+    const balanceFactor = getHeightDifference(root)
+    return isValidBalanceFactor(balanceFactor) ? root : insertBalance(root, val, balanceFactor)
+  }
+
+    const deleteElement = function (root, _val, tree) {
+    if (root == null) { return root }
+    if (tree._comp(root._val, _val) === 0) {       if (root._left === null && root._right === null) {
+        root = null
+        tree.size--
+      } else if (root._left === null) {
+        root = root._right
+        tree.size--
+      } else if (root._right === null) {
+        root = root._left
+        tree.size--
+      } else {
+        let temp = root._right
+        while (temp._left != null) {
+          temp = temp._left
+        }
+        root._val = temp._val
+        root._right = deleteElement(root._right, temp._val, tree)
+      }
+    } else {
+      if (tree._comp(root._val, _val) < 0) {
+        root._right = deleteElement(root._right, _val, tree)
+      } else {
+        root._left = deleteElement(root._left, _val, tree)
+      }
+    }
+    updateHeight(root)
+    root = delBalance(root)
+    return root
+  }
+    const searchAVLTree = function (root, val, tree) {
+    if (root == null) { return null }
+    if (tree._comp(root._val, val) === 0) {
+      return root
+    }
+    if (tree._comp(root._val, val) < 0) {
+      return searchAVLTree(root._right, val, tree)
+    }
+    return searchAVLTree(root._left, val, tree)
+  }
+
+  /
+  /
+  _avl.prototype.add = function (_val) {
+    const prevSize = this.size
+    this.root = insert(this.root, _val, this)
+    return this.size !== prevSize
+  }
+  /
+  _avl.prototype.find = function (_val) {
+    const temp = searchAVLTree(this.root, _val, this)
+    return temp != null
+  }
+  /
+  _avl.prototype.remove = function (_val) {
+    const prevSize = this.size
+    this.root = deleteElement(this.root, _val, this)
+    return prevSize !== this.size
+  }
+  return _avl
+}())
+
+
+
+
+/
+
+const Node = (function Node () {
+    function Node (val) {
+    this.value = val
+    this.left = null
+    this.right = null
+  }
+
+    Node.prototype.search = function (val) {
+    if (this.value === val) {
+      return this
+    } else if (val < this.value && this.left !== null) {
+      return this.left.search(val)
+    } else if (val > this.value && this.right !== null) {
+      return this.right.search(val)
+    }
+    return null
+  }
+
+    Node.prototype.visit = function (output = value => console.log(value)) {
+        if (this.left !== null) {
+      this.left.visit()
+    }
+        output(this.value)
+        if (this.right !== null) {
+      this.right.visit()
+    }
+  }
+
+    Node.prototype.addNode = function (n) {
+    if (n.value < this.value) {
+      if (this.left === null) {
+        this.left = n
+      } else {
+        this.left.addNode(n)
+      }
+    } else if (n.value > this.value) {
+      if (this.right === null) {
+        this.right = n
+      } else {
+        this.right.addNode(n)
+      }
+    }
+  }
+
+    Node.prototype.removeNode = function (val) {
+    if (val === this.value) {
+      if (!this.left && !this.right) {
+        return null
+      } else {
+        if (this.left) {
+          const leftMax = maxVal(this.left)
+          this.value = leftMax
+          this.left = this.left.removeNode(leftMax)
+        } else {
+          const rightMin = minVal(this.right)
+          this.value = rightMin
+          this.right = this.right.removeNode(rightMin)
+        }
+      }
+    } else if (val < this.value) {
+      this.left = this.left && this.left.removeNode(val)
+    } else if (val > this.value) {
+      this.right = this.right && this.right.removeNode(val)
+    }
+    return this
+  }
+
+    const maxVal = function (node) {
+    if (!node.right) {
+      return node.value
+    }
+    return maxVal(node.right)
+  }
+
+    const minVal = function (node) {
+    if (!node.left) {
+      return node.value
+    }
+    return minVal(node.left)
+  }
+    return Node
+}())
+
+const Tree = (function () {
+  function Tree () {
+        this.root = null
+  };
+
+    Tree.prototype.traverse = function () {
+    if (!this.root) {
+            return
+    }
+    this.root.visit()
+  }
+
+    Tree.prototype.search = function (val) {
+    const found = this.root.search(val)
+    if (found !== null) {
+      return found.value
+    }
+        return null
+  }
+
+    Tree.prototype.addValue = function (val) {
+    const n = new Node(val)
+    if (this.root === null) {
+      this.root = n
+    } else {
+      this.root.addNode(n)
+    }
+  }
+
+    Tree.prototype.removeValue = function (val) {
+        this.root = this.root && this.root.removeNode(val)
+  }
+
+    return Tree
+}())
+
+
+
+
+
+const TrieNode = function TrieNode (key, parent) {
+  this.key = key
+  this.count = 0
+  this.children = Object.create(null)
+  if (parent === undefined) {
+    this.parent = null
+  } else {
+    this.parent = parent
+  }
+}
+
+function Trie () {
+    this.root = new TrieNode(null, null)
+}
+
+Trie.findAllWords = function (root, word, output) {
+  if (root === null) return
+  if (root.count > 0) {
+    if (typeof output === 'object') { output.push({ word, count: root.count }) }
+  }
+  let key
+  for (key in root.children) {
+    word += key
+    this.findAllWords(root.children[key], word, output)
+    word = word.slice(0, -1)
+  }
+}
+
+Trie.prototype.insert = function (word) {
+  if (typeof word !== 'string') return
+  if (word === '') {
+    this.root.count += 1
+    return
+  }
+  let node = this.root
+  const len = word.length
+  let i
+  for (i = 0; i < len; i++) {
+    if (node.children[word.charAt(i)] === undefined) { node.children[word.charAt(i)] = new TrieNode(word.charAt(i), node) }
+    node = node.children[word.charAt(i)]
+  }
+  node.count += 1
+}
+
+Trie.prototype.findPrefix = function (word) {
+  if (typeof word !== 'string') return null
+  let node = this.root
+  const len = word.length
+  let i
+    for (i = 0; i < len; i++) {
+    if (node.children[word.charAt(i)] === undefined) return null     node = node.children[word.charAt(i)]
+  }
+  return node
+}
+
+Trie.prototype.remove = function (word, count) {
+  if (typeof word !== 'string') return
+  if (typeof count !== 'number') count = 1
+  else if (count <= 0) return
+
+    if (word === '') {
+    if (this.root.count >= count) this.root.count -= count
+    else this.root.count = 0
+    return
+  }
+
+  let child = this.root
+  const len = word.length
+  let i, key
+    for (i = 0; i < len; i++) {
+    key = word.charAt(i)
+    if (child.children[key] === undefined) return
+    child = child.children[key]
+  }
+
+    if (child.count >= count) child.count -= count
+  else child.count = 0
+
+          if (child.count <= 0 && (Object.keys(child.children).length && child.children.constructor === Object)) {
+    child.parent.children[child.key] = undefined
+  }
+}
+
+Trie.prototype.findAllWords = function (prefix) {
+  const output = []
+    const node = this.findPrefix(prefix)
+    if (node === null) return output
+  Trie.findAllWords(node, prefix, output)
+  return output
+}
+
+Trie.prototype.contains = function (word) {
+    const node = this.findPrefix(word)
+    if (node === null || node.count === 0) return false
+  return true
+}
+
+Trie.prototype.findOccurences = function (word) {
+    const node = this.findPrefix(word)
+    if (node === null) return 0
+  return node.count
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class SinglyCircularLinkedList {
+  constructor () {
+    this.headNode = null
+    this.length = 0
+  }
+
+    size = () => this.length
+    head = () => this.headNode?.data || null
+    isEmpty = () => this.length === 0
+
+    initiateNodeAndIndex () {
+    return { currentNode: this.headNode, currentIndex: 0 }
+  }
+
+    getElementAt (index) {
+    if (this.length !== 0 && index >= 0 && index <= this.length) {
+      let { currentNode } = this.initiateNodeAndIndex()
+      for (let i = 0; i < index && currentNode !== null; i++) {
+        currentNode = currentNode.next
+      }
+      return currentNode
+    }
+    return undefined
+  }
+
+    addAtFirst (data) {
+    const node = new Node(data)
+    node.next = this.headNode
+    this.headNode = node
+    this.length++
+    return this.length
+  }
+
+    add (data) {
+    if (!this.headNode) { return this.addAtFirst(data) }
+    const node = new Node(data)
+        const currentNode = this.getElementAt(this.length - 1)
+    currentNode.next = node
+    node.next = this.headNode
+    this.length++
+    return this.length
+  }
+
+    insertAt (index, data) {
+    if (index === 0) return this.addAtFirst(data)
+    if (index === this.length) return this.add(data)
+    if (index < 0 || index > this.length) throw new RangeError(`Index is out of range max ${this.length}`)
+    const node = new Node(data)
+    const previousNode = this.getElementAt(index - 1)
+    node.next = previousNode.next
+    previousNode.next = node
+    this.length++
+    return this.length
+  }
+
+    indexOf (data) {
+    let { currentNode } = this.initiateNodeAndIndex()
+        let currentIndex = -1
+    while (currentNode) {
+      if (currentNode.data === data) {
+        return currentIndex + 1
+      }
+      currentIndex++
+      currentNode = currentNode.next
+    }
+    return -1
+  }
+
+    remove () {
+    if (this.isEmpty()) return null
+    const secondLastNode = this.getElementAt(this.length - 2)
+    const removedNode = secondLastNode.next
+    secondLastNode.next = this.headNode
+    this.length--
+    return removedNode.data || null
+  }
+
+    removeFirst () {
+    if (this.isEmpty()) return null
+    const removedNode = this.headNode
+    if (this.length === 1) {
+      this.clear()
+      return removedNode.data
+    }
+    const lastNode = this.getElementAt(this.length - 1)
+    this.headNode = this.headNode.next
+    lastNode.next = this.headNode
+    this.length--
+    return removedNode.data || null
+  }
+
+    removeAt (index) {
+    if (this.isEmpty()) return null
+    if (index === 0) return this.removeFirst()
+    if (index === this.length) return this.remove()
+    if (index < 0 && index > this.length) return null
+    const previousNode = this.getElementAt(index - 1)
+    const currentNode = previousNode.next
+    previousNode.next = currentNode.next
+    this.length--
+    return currentNode.data || null
+  }
+
+    removeData (data) {
+    if (this.isEmpty()) return null
+    const index = this.indexOf(data)
+    return this.removeAt(index)
+  }
+
+    printData (output = value => console.log(value)) {
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+
+    while (currentNode !== null && currentIndex < this.length) {
+      output(currentNode.data)
+      currentNode = currentNode.next
+      currentIndex++
+    }
+  }
+
+    get () {
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+    const list = []
+    while (currentNode !== null && currentIndex < this.length) {
+      list.push(currentNode.data)
+      currentNode = currentNode.next
+      currentIndex++
+    }
+    return list
+  }
+
+  clear () {
+    this.headNode = null
+    this.length = 0
+  }
+}
+
+
+
+
+
+/
+
+class AddTwoNumbers {
+  constructor () {
+    this.dummyNode = new Node(0)
+  }
+
+  solution (firstList, secondList) {
+    let firstRunner = firstList
+    let secondRunner = secondList
+    let tail = this.dummyNode
+    let carry = 0
+    while (firstRunner != null || secondRunner != null) {
+      const firstNumber = firstRunner ? firstRunner.data : 0
+      const secondNumber = secondRunner ? secondRunner.data : 0
+      const sum = carry + firstNumber + secondNumber
+      carry = parseInt(sum / 10)
+      tail.next = new Node(sum % 10)
+      tail = tail.next
+      if (firstRunner) {
+        firstRunner = firstRunner.next
+      }
+      if (secondRunner) {
+        secondRunner = secondRunner.next
+      }
+    }
+    if (carry > 0) {
+      tail.next = new Node(carry % 10)
+    }
+
+    return this.dummyNode.next
+  }
+
+  solutionToArray () {
+    const list = []
+    let currentNode = this.dummyNode.next
+    while (currentNode) {
+      list.push(currentNode.data)
+      currentNode = currentNode.next
+    }
+
+    return list
+  }
+}
+
+
+
+
+function main () {
+  /
+  const head = ''   let fast = head
+  let slow = head
+
+  while (fast != null && fast.next != null && slow != null) {
+    fast = fast.next.next
+    slow = slow.next
+    if (fast === slow) {
+      return true
+    }
+  }
+  return false
+}
+
+main()
+class Node {
+  constructor (element) {
+    this.element = element
+    this.next = null
+    this.prev = null
+  }
+}
+
+class DoubleLinkedList {
+  constructor () {
+    this.length = 0
+    this.head = null
+    this.tail = null
+  }
+
+    append (element) {
+    const node = new Node(element)
+
+    if (!this.head) {
+      this.head = node
+      this.tail = node
+    } else {
+      node.prev = this.tail
+      this.tail.next = node
+      this.tail = node
+    }
+
+    this.length++
+  }
+
+    insert (position, element) {
+        if (position >= 0 && position <= this.length) {
+      const node = new Node(element)
+      let current = this.head
+      let previous = 0
+      let index = 0
+
+      if (position === 0) {
+        if (!this.head) {
+          this.head = node
+          this.tail = node
+        } else {
+          node.next = current
+          current.prev = node
+          this.head = node
+        }
+      } else if (position === this.length) {
+        current = this.tail
+        current.next = node
+        node.prev = current
+        this.tail = node
+      } else {
+        while (index++ < position) {
+          previous = current
+          current = current.next
+        }
+
+        node.next = current
+        previous.next = node
+
+                current.prev = node
+        node.prev = previous
+      }
+
+      this.length++
+      return true
+    } else {
+      return false
+    }
+  }
+
+    removeAt (position) {
+        if (position > -1 && position < this.length) {
+      let current = this.head
+      let previous = 0
+      let index = 0
+
+            if (position === 0) {
+        this.head = current.next
+
+                if (this.length === 1) {
+          this.tail = null
+        } else {
+          this.head.prev = null
+        }
+      } else if (position === this.length - 1) {
+        current = this.tail
+        this.tail = current.prev
+        this.tail.next = null
+      } else {
+        while (index++ < position) {
+          previous = current
+          current = current.next
+        }
+
+                previous.next = current.next
+        current.next.prev = previous
+      }
+
+      this.length--
+      return current.element
+    } else {
+      return null
+    }
+  }
+
+    indexOf (elm) {
+    let current = this.head
+    let index = -1
+
+        while (current) {
+      if (elm === current.element) {
+        return ++index
+      }
+
+      index++
+      current = current.next
+    }
+
+        return -1
+  }
+
+    isPresent (elm) {
+    return this.indexOf(elm) !== -1
+  }
+
+    delete (elm) {
+    return this.removeAt(this.indexOf(elm))
+  }
+
+    deleteHead () {
+    this.removeAt(0)
+  }
+
+    deleteTail () {
+    this.removeAt(this.length - 1)
+  }
+
+    toString () {
+    let current = this.head
+    let string = ''
+
+    while (current) {
+      string += current.element + (current.next ? '\n' : '')
+      current = current.next
+    }
+
+    return string
+  }
+
+    toArray () {
+    const arr = []
+    let current = this.head
+
+    while (current) {
+      arr.push(current.element)
+      current = current.next
+    }
+
+    return arr
+  }
+
+    isEmpty () {
+    return this.length === 0
+  }
+
+    size () {
+    return this.length
+  }
+
+    getHead () {
+    return this.head
+  }
+
+    getTail () {
+    return this.tail
+  }
+
+    iterator () {
+    let currentNode = this.getHead()
+    if (currentNode === null) return -1
+
+    const iterate = function * () {
+      while (currentNode) {
+        yield currentNode.element
+        currentNode = currentNode.next
+      }
+    }
+    return iterate()
+  }
+
+      log () {
+    let currentNode = this.getHead()
+    while (currentNode) {
+      console.log(currentNode.element)
+      currentNode = currentNode.next
+    }
+  }
+}
+
+
+
+
+
+
+function main () {
+  /
+    let head = ''
+  let k = ''
+  let i = 0
+  let current = head
+  while (current) {
+    i++
+    current = current.next
+  }
+  k %= i
+  current = head
+  let prev = null
+  while (k--) {
+    if (!current || !current.next) {
+      return current
+    } else {
+      while (current.next) {
+        prev = current
+        current = current.next
+      }
+      prev.next = current.next
+      current.next = head
+      head = current
+    }
+  }
+  return head
+}
+
+main()
+/
+
+
+class Node {
+  constructor (data) {
+    this.data = data
+    this.next = null
+  }
+}
+
+class LinkedList {
+  constructor () {
+    this.headNode = null
+    this.length = 0
+  }
+
+    initiateNodeAndIndex () {
+    return { currentNode: this.headNode, currentIndex: 0 }
+  }
+
+    size () {
+    return this.length
+  }
+
+    head () {
+    return this.headNode?.data || null
+  }
+
+    isEmpty () {
+    return this.length === 0
+  }
+
+    addLast (element) {
+        if (this.headNode === null) {
+      return this.addFirst(element)
+    }
+    let { currentNode } = this.initiateNodeAndIndex()
+
+        while (currentNode.next) {
+      currentNode = currentNode.next
+    }
+
+    const node = new Node(element)
+        currentNode.next = node
+    this.length++
+    return this.size()
+  }
+
+    addFirst (element) {
+    const node = new Node(element)
+    node.next = this.headNode
+    this.headNode = node
+    this.length++
+    return this.size()
+  }
+
+    removeFirst () {
+    const removedNode = this.headNode
+    if (this.length > 0) {
+      this.headNode = this.headNode.next
+      this.length--
+    }
+    console.log(removedNode.data)
+    return removedNode?.data
+  }
+
+    removeLast () {
+    if (this.isEmpty()) return null
+    if (this.length === 1) {
+      return this.removeFirst()
+    }
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+    while (currentIndex !== this.length - 2) {
+      currentIndex++
+      currentNode = currentNode.next
+    }
+    const removedNode = currentNode.next
+    currentNode.next = null
+    this.length--
+    return removedNode.data
+  }
+
+    remove (element) {
+    if (this.isEmpty()) return null
+    let { currentNode } = this.initiateNodeAndIndex()
+    let removedNode = null
+        if (currentNode.data === element) {
+      return this.removeFirst()
+    }
+        while (currentNode?.next) {
+      if (currentNode.next.data === element) {
+        removedNode = currentNode.next
+        currentNode.next = currentNode.next.next
+        this.length--
+        break
+      }
+      currentNode = currentNode.next
+    }
+    return removedNode?.data || null
+  }
+
+    indexOf (element) {
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+
+    while (currentNode) {
+            if (currentNode.data === element) {
+        return currentIndex
+      }
+      currentNode = currentNode.next
+      currentIndex++
+    }
+    return -1
+  }
+
+    elementAt (index) {
+    if (index >= this.length || index < 0) {
+      throw new RangeError('Out of Range index')
+    }
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+    while (currentIndex < index) {
+      currentIndex++
+      currentNode = currentNode.next
+    }
+    return currentNode.data
+  }
+
+    addAt (index, element) {
+        if (index > this.length || index < 0) {
+      throw new RangeError('Out of Range index')
+    }
+    if (index === 0) return this.addFirst(element)
+    if (index === this.length) return this.addLast(element)
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+    const node = new Node(element)
+
+    while (currentIndex !== index - 1) {
+      currentIndex++
+      currentNode = currentNode.next
+    }
+
+        const tempNode = currentNode.next
+    currentNode.next = node
+    node.next = tempNode
+        this.length++
+    return this.size()
+  }
+
+    removeAt (index) {
+        if (index < 0 || index >= this.length) {
+      throw new RangeError('Out of Range index')
+    }
+    if (index === 0) return this.removeFirst()
+    if (index === this.length) return this.removeLast()
+
+    let { currentIndex, currentNode } = this.initiateNodeAndIndex()
+    while (currentIndex !== index - 1) {
+      currentIndex++
+      currentNode = currentNode.next
+    }
+    const removedNode = currentNode.next
+    currentNode.next = currentNode.next.next
+        this.length--
+    return removedNode.data
+  }
+
+    clean () {
+    this.headNode = null
+    this.length = 0
+  }
+
+    get () {
+    const list = []
+    let { currentNode } = this.initiateNodeAndIndex()
+    while (currentNode) {
+      list.push(currentNode.data)
+      currentNode = currentNode.next
+    }
+
+    return list
+  }
+
+    iterator () {
+    let { currentNode } = this.initiateNodeAndIndex()
+    if (currentNode === null) return -1
+
+    const iterate = function * () {
+      while (currentNode) {
+        yield currentNode.data
+        currentNode = currentNode.next
+      }
+    }
+    return iterate()
+  }
+
+    log () {
+    console.log(JSON.stringify(this.headNode, null, 2))
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+const findMaxPointIndex = (array, rangeStartIndex, rangeEndIndex, originalLength) => {
+    const middleIndex = rangeStartIndex + parseInt((rangeEndIndex - rangeStartIndex) / 2)
+
+    if ((middleIndex === 0 || array[middleIndex - 1] <= array[middleIndex]) &&
+        (middleIndex === originalLength - 1 || array[middleIndex + 1] <= array[middleIndex])) {
+    return middleIndex
+  } else if (middleIndex > 0 && array[middleIndex - 1] > array[middleIndex]) {
+    return findMaxPointIndex(array, rangeStartIndex, (middleIndex - 1), originalLength)
+  } else {
+        return findMaxPointIndex(array, (middleIndex + 1), rangeEndIndex, originalLength)
+  }
+}
+
+const LocalMaximomPoint = (A) => findMaxPointIndex(A, 0, A.length - 1, A.length)
+
+
+
+
+const IsMaximumPoint = (array, index) => {
+      if (index === 0) {
+    return array[index] > array[index + 1]
+      } else if (index === array.length - 1) {
+    return array[index] > array[index - 1]
+      } else {
+    return array[index] > array[index + 1] && array[index] > array[index - 1]
+  }
+}
+
+const CountLocalMaximumPoints = (array, startIndex, endIndex) => {
+    if (startIndex === endIndex) {
+    return IsMaximumPoint(array, startIndex) ? 1 : 0
+  }
+
+    const middleIndex = parseInt((startIndex + endIndex) / 2)
+  return CountLocalMaximumPoints(array, startIndex, middleIndex) +
+    CountLocalMaximumPoints(array, middleIndex + 1, endIndex)
+}
+
+const NumberOfLocalMaximumPoints = (A) => CountLocalMaximumPoints(A, 0, A.length - 1)
+
+
+
+
+function QuickSelect (items, kth) {   if (kth < 1 || kth > items.length) {
+    throw new RangeError('Index Out of Bound')
+  }
+
+  return RandomizedSelect(items, 0, items.length - 1, kth)
+}
+
+function RandomizedSelect (items, left, right, i) {
+  if (left === right) return items[left]
+
+  const pivotIndex = RandomizedPartition(items, left, right)
+  const k = pivotIndex - left + 1
+
+  if (i === k) return items[pivotIndex]
+  if (i < k) return RandomizedSelect(items, left, pivotIndex - 1, i)
+
+  return RandomizedSelect(items, pivotIndex + 1, right, i - k)
+}
+
+function RandomizedPartition (items, left, right) {
+  const rand = getRandomInt(left, right)
+  Swap(items, rand, right)
+  return Partition(items, left, right)
+}
+
+function Partition (items, left, right) {
+  const x = items[right]
+  let pivotIndex = left - 1
+
+  for (let j = left; j < right; j++) {
+    if (items[j] <= x) {
+      pivotIndex++
+      Swap(items, pivotIndex, j)
+    }
+  }
+
+  Swap(items, pivotIndex + 1, right)
+
+  return pivotIndex + 1
+}
+
+function getRandomInt (min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function Swap (arr, x, y) {
+  [arr[x], arr[y]] = [arr[y], arr[x]]
+}
+
+
+class Graph {
+  constructor () {
+    this.adjacencyMap = {}
+  }
+
+  addVertex (vertex) {
+    this.adjacencyMap[vertex] = []
+  }
+
+  containsVertex (vertex) {
+    return typeof (this.adjacencyMap[vertex]) !== 'undefined'
+  }
+
+  addEdge (vertex1, vertex2) {
+    if (this.containsVertex(vertex1) && this.containsVertex(vertex2)) {
+      this.adjacencyMap[vertex1].push(vertex2)
+      this.adjacencyMap[vertex2].push(vertex1)
+    }
+  }
+
+  printGraph (output = value => console.log(value)) {
+    const keys = Object.keys(this.adjacencyMap)
+    for (const i of keys) {
+      const values = this.adjacencyMap[i]
+      let vertex = ''
+      for (const j of values) {
+        vertex += j + ' '
+      }
+      output(i + ' -> ' + vertex)
+    }
+  }
+
+  /
+  bfs (source, output = value => console.log(value)) {
+    const queue = [[source, 0]]     const visited = new Set()
+
+    while (queue.length) {
+      const [node, level] = queue.shift()       if (visited.has(node)) {         continue
+      }
+
+      visited.add(node)
+      output(`Visited node ${node} at level ${level}.`)
+      for (const next of this.adjacencyMap[node]) {
+        queue.push([next, level + 1])       }
+    }
+  }
+
+  /
+  dfs (source, visited = new Set(), output = value => console.log(value)) {
+    if (visited.has(source)) {       return
+    }
+
+    output(`Visited node ${source}`)
+    visited.add(source)
+    for (const neighbour of this.adjacencyMap[source]) {
+      this.dfs(neighbour, visited, output)
+    }
+  }
+}
+
+const example = () => {
+  const g = new Graph()
+  g.addVertex(1)
+  g.addVertex(2)
+  g.addVertex(3)
+  g.addVertex(4)
+  g.addVertex(5)
+  g.addEdge(1, 2)
+  g.addEdge(1, 3)
+  g.addEdge(2, 4)
+  g.addEdge(2, 5)
+
+            
+    
+    g.bfs(1)
+
+    g.dfs(1)
+}
+
+
+
+
+
+
+
+
+class Graph {
+      constructor (noOfVertices) {
+    this.noOfVertices = noOfVertices
+    this.AdjList = new Map()
+  }
+
+  
+      
+    
+    addVertex (v) {
+        
+    this.AdjList.set(v, [])
+  }
+
+    addEdge (v, w) {
+            this.AdjList.get(v).push(w)
+
+            this.AdjList.get(w).push(v)
+  }
+
+    printGraph (output = value => console.log(value)) {
+        const getKeys = this.AdjList.keys()
+
+        for (const i of getKeys) {
+                  const getValues = this.AdjList.get(i)
+      let conc = ''
+
+                  for (const j of getValues) {
+        conc += j + ' '
+      }
+
+            output(i + ' -> ' + conc)
+    }
+  }
+}
+
+
+class Graph {
+  constructor () {
+    this.adjacencyObject = {}
+  }
+
+  addVertex (vertex) {
+    if (!this.adjacencyObject[vertex]) this.adjacencyObject[vertex] = []
+  }
+
+  addEdge (vertex1, vertex2) {
+    this.adjacencyObject[vertex1].push(vertex2)
+    this.adjacencyObject[vertex2].push(vertex1)
+  }
+
+  removeEdge (vertex1, vertex2) {
+    this.adjacencyObject[vertex1] = this.adjacencyObject[vertex1].filter(
+      (v) => v !== vertex2
+    )
+    this.adjacencyObject[vertex2] = this.adjacencyObject[vertex2].filter(
+      (v) => v !== vertex1
+    )
+  }
+
+  removeVertex (vertex) {
+    while (this.adjacencyObject[vertex].length) {
+      const adjacentVertex = this.adjacencyObject[vertex].pop()
+      this.removeEdge(vertex, adjacentVertex)
+    }
+  }
+
+  /
+  DFS (start) {
+    if (!start) return null
+
+    const result = []
+    const visited = {}
+    const adjacencyObject = this.adjacencyObject
+
+    function dfs (vertex) {
+      if (!vertex) return null
+      visited[vertex] = true
+      result.push(vertex)
+      adjacencyObject[vertex].forEach((neighbor) => {
+        if (!visited[neighbor]) {
+          dfs(neighbor)
+        }
+      })
+    }
+
+    dfs(start)
+    return result
+  }
+
+  /
+  DFSIterative (start) {
+    if (!start) return null
+
+    const stack = [start]
+    const visited = {}
+    visited[start] = true
+
+    const result = []
+    let currentVertex
+
+    while (stack.length) {
+      currentVertex = stack.pop()
+      result.push(currentVertex)
+
+      this.adjacencyObject[currentVertex].forEach((neighbor) => {
+        if (!visited[neighbor]) {
+          visited[neighbor] = true
+          stack.push(neighbor)
+        }
+      })
+    }
+    return result
+  }
+
+  BFS (start) {
+    if (!start) return null
+
+    const queue = [start]
+    const visited = {}
+    visited[start] = true
+
+    let currentVertex
+    const result = []
+
+    while (queue.length) {
+      currentVertex = queue.shift()
+      result.push(currentVertex)
+
+      this.adjacencyObject[currentVertex].forEach((neighbor) => {
+        if (!visited[neighbor]) {
+          visited[neighbor] = true
+          queue.push(neighbor)
+        }
+      })
+    }
+    return result
+  }
+}
+
+
+
+
+class Vector2 {
+  constructor (x, y) {
+    this.x = x
+    this.y = y
+  }
+
+  /
+  equalsExactly (vector) {
+    return this.x === vector.x && this.y === vector.y
+  }
+
+  /
+  equalsApproximately (vector, epsilon) {
+    return (Math.abs(this.x - vector.x) < epsilon && Math.abs(this.y - vector.y) < epsilon)
+  }
+
+  /
+  length () {
+    return Math.sqrt(this.x * this.x + this.y * this.y)
+  }
+
+  /
+  normalize () {
+    const length = this.length()
+    if (length === 0) {
+      throw new Error('Cannot normalize vectors of length 0')
+    }
+    return new Vector2(this.x / length, this.y / length)
+  }
+
+  /
+  add (vector) {
+    const x = this.x + vector.x
+    const y = this.y + vector.y
+    return new Vector2(x, y)
+  }
+
+  /
+  subtract (vector) {
+    const x = this.x - vector.x
+    const y = this.y - vector.y
+    return new Vector2(x, y)
+  }
+
+  /
+  multiply (scalar) {
+    const x = this.x * scalar
+    const y = this.y * scalar
+    return new Vector2(x, y)
+  }
+
+  /
+  distance (vector) {
+    const difference = vector.subtract(this)
+    return difference.length()
+  }
+
+  /
+  dotProduct (vector) {
+    return this.x * vector.x + this.y * vector.y
+  }
+
+  /
+  rotate (angleInRadians) {
+    const ca = Math.cos(angleInRadians)
+    const sa = Math.sin(angleInRadians)
+    const x = ca * this.x - sa * this.y
+    const y = sa * this.x + ca * this.y
+    return new Vector2(x, y)
+  }
+
+  /
+  angleBetween (vector) {
+    return Math.atan2(vector.y, vector.x) - Math.atan2(this.y, this.x)
+  }
+}
+
+
+
+
+
+
+
+class MinHeap {
+  constructor (array) {
+    this.heap = this.initializeHeap(array)
+  }
+
+  /
+  initializeHeap (array) {
+    const startingParent = Math.floor((array.length - 2) / 2)
+
+    for (let currIdx = startingParent; currIdx >= 0; currIdx--) {
+      this.sinkDown(currIdx, array.length - 1, array)
+    }
+    return array
+  }
+
+  /
+  sinkDown (currIdx, endIdx, heap) {
+    let childOneIdx = currIdx * 2 + 1
+
+    while (childOneIdx <= endIdx) {
+      const childTwoIdx = childOneIdx + 1 <= endIdx ? childOneIdx + 1 : -1
+      const swapIdx = childTwoIdx !== -1 && heap[childTwoIdx] < heap[childOneIdx]
+        ? childTwoIdx
+        : childOneIdx
+
+      if (heap[swapIdx] < heap[currIdx]) {
+        this.swap(currIdx, swapIdx, heap)
+        currIdx = swapIdx
+        childOneIdx = currIdx * 2 + 1
+      } else {
+        return
+      }
+    }
+  }
+
+  /
+  bubbleUp (currIdx) {
+    let parentIdx = Math.floor((currIdx - 1) / 2)
+
+    while (currIdx > 0 && this.heap[currIdx] < this.heap[parentIdx]) {
+      this.swap(currIdx, parentIdx, this.heap)
+      currIdx = parentIdx
+      parentIdx = Math.floor((currIdx - 1) / 2)
+    }
+  }
+
+  peek () {
+    return this.heap[0]
+  }
+
+  /
+  extractMin () {
+    this.swap(0, this.heap.length - 1, this.heap)
+    const min = this.heap.pop()
+    this.sinkDown(0, this.heap.length - 1, this.heap)
+    return min
+  }
+
+    insert (value) {
+    this.heap.push(value)
+    this.bubbleUp(this.heap.length - 1)
+  }
+
+    swap (idx1, idx2, heap) {
+    const temp = heap[idx1]
+    heap[idx1] = heap[idx2]
+    heap[idx2] = temp
+  }
+}
+
+
+
+
+
+
+
+
+
+
+class BinaryHeap {
+  constructor () {
+    this.heap = []
+  }
+
+  insert (value) {
+    this.heap.push(value)
+    this.heapify()
+  }
+
+  size () {
+    return this.heap.length
+  }
+
+  empty () {
+    return this.size() === 0
+  }
+
+    heapify () {
+    let index = this.size() - 1
+
+    while (index > 0) {
+      const element = this.heap[index]
+      const parentIndex = Math.floor((index - 1) / 2)
+      const parent = this.heap[parentIndex]
+
+      if (parent[0] >= element[0]) break
+      this.heap[index] = parent
+      this.heap[parentIndex] = element
+      index = parentIndex
+    }
+  }
+
+    extractMax () {
+    const max = this.heap[0]
+    const tmp = this.heap.pop()
+    if (!this.empty()) {
+      this.heap[0] = tmp
+      this.sinkDown(0)
+    }
+    return max
+  }
+
+    sinkDown (index) {
+    const left = 2 * index + 1
+    const right = 2 * index + 2
+    let largest = index
+    const length = this.size()
+
+    if (left < length && this.heap[left][0] > this.heap[largest][0]) {
+      largest = left
+    }
+    if (right < length && this.heap[right][0] > this.heap[largest][0]) {
+      largest = right
+    }
+        if (largest !== index) {
+      const tmp = this.heap[largest]
+      this.heap[largest] = this.heap[index]
+      this.heap[index] = tmp
+      this.sinkDown(largest)
+    }
+  }
+}
+
+
+
+
+
+/
+
+
+class MinPriorityQueue {
+    constructor (c) {
+    this.heap = []
+    this.capacity = c
+    this.size = 0
+  }
+
+      insert (key) {
+    if (this.isFull()) return
+    this.heap[this.size + 1] = key
+    let k = this.size + 1
+    while (k > 1) {
+      if (this.heap[k] < this.heap[Math.floor(k / 2)]) {
+        const temp = this.heap[k]
+        this.heap[k] = this.heap[Math.floor(k / 2)]
+        this.heap[Math.floor(k / 2)] = temp
+      }
+      k = Math.floor(k / 2)
+    }
+    this.size++
+  }
+
+    peek () {
+    return this.heap[1]
+  }
+
+    isEmpty () {
+    return this.size === 0
+  }
+
+    isFull () {
+    if (this.size === this.capacity) return true
+    return false
+  }
+
+    print (output = value => console.log(value)) {
+    output(this.heap.slice(1))
+  }
+
+        heapReverse () {
+    const heapSort = []
+    while (this.size > 0) {
+            [this.heap[1], this.heap[this.size]] = [this.heap[this.size], this.heap[1]]
+      heapSort.push(this.heap.pop())
+      this.size--
+      this.sink()
+    }
+            this.heap = [undefined, ...heapSort.reverse()]
+    this.size = heapSort.length
+  }
+
+    sink () {
+    let k = 1
+    while (2 * k <= this.size || 2 * k + 1 <= this.size) {
+      let minIndex
+      if (this.heap[2 * k] >= this.heap[k]) {
+        if (2 * k + 1 <= this.size && this.heap[2 * k + 1] >= this.heap[k]) {
+          break
+        } else if (2 * k + 1 > this.size) {
+          break
+        }
+      }
+      if (2 * k + 1 > this.size) {
+        minIndex = this.heap[2 * k] < this.heap[k] ? 2 * k : k
+      } else {
+        if (
+          this.heap[k] > this.heap[2 * k] ||
+          this.heap[k] > this.heap[2 * k + 1]
+        ) {
+          minIndex =
+            this.heap[2 * k] < this.heap[2 * k + 1] ? 2 * k : 2 * k + 1
+        } else {
+          minIndex = k
+        }
+      }
+      const temp = this.heap[k]
+      this.heap[k] = this.heap[minIndex]
+      this.heap[minIndex] = temp
+      k = minIndex
+    }
+  }
+
+      delete () {
+        if (this.isEmpty()) return
+    if (this.size === 1) {
+      this.size--
+      return this.heap.pop()
+    }
+    const min = this.heap[1]
+    this.heap[1] = this.heap.pop()
+    this.size--
+    this.sink()
+    return min
+  }
+}
+
+
+
+class Queue {
+  constructor () {
+    this.inputStack = []
+    this.outputStack = []
+  }
+
+    enqueue (item) {
+    this.inputStack.push(item)
+  }
+
+  dequeue () {
+        this.outputStack = []
+    while (this.inputStack.length > 0) {
+      this.outputStack.push(this.inputStack.pop())
+    }
+        if (this.outputStack.length > 0) {
+      const top = this.outputStack.pop()
+            this.inputStack = []
+      while (this.outputStack.length > 0) {
+        this.inputStack.push(this.outputStack.pop())
+      }
+      return top
+    }
+  }
+
+    listIn (output = value => console.log(value)) {
+    let i = 0
+    while (i < this.inputStack.length) {
+      output(this.inputStack[i])
+      i++
+    }
+  }
+
+    listOut (output = value => console.log(value)) {
+    let i = 0
+    while (i < this.outputStack.length) {
+      output(this.outputStack[i])
+      i++
+    }
+  }
+}
+
+
+
+
+
+
+
+
+/
+
+class Queue {
+  #size
+
+  constructor () {
+    this.head = null
+    this.tail = null
+    this.#size = 0
+
+    return Object.seal(this)
+  }
+
+  get length () {
+    return this.#size
+  }
+
+  /
+  enqueue (data) {
+    const node = { data, next: null }
+
+    if (!this.head && !this.tail) {
+      this.head = node
+      this.tail = node
+    } else {
+      this.tail.next = node
+      this.tail = node
+    }
+
+    return ++this.#size
+  }
+
+  /
+  dequeue () {
+    if (this.isEmpty()) {
+      throw new Error('Queue is Empty')
+    }
+
+    const firstData = this.peekFirst()
+
+    this.head = this.head.next
+
+    if (!this.head) {
+      this.tail = null
+    }
+
+    this.#size--
+
+    return firstData
+  }
+
+  /
+  peekFirst () {
+    if (this.isEmpty()) {
+      throw new Error('Queue is Empty')
+    }
+
+    return this.head.data
+  }
+
+  /
+  peekLast () {
+    if (this.isEmpty()) {
+      throw new Error('Queue is Empty')
+    }
+
+    return this.tail.data
+  }
+
+  /
+  toArray () {
+    const array = []
+    let node = this.head
+
+    while (node) {
+      array.push(node.data)
+      node = node.next
+    }
+
+    return array
+  }
+
+  /
+  isEmpty () {
+    return this.length === 0
+  }
+}
+
+
+
+class CircularQueue {
+  constructor (maxLength) {
+    this.queue = []
+    this.front = 0
+    this.rear = 0
+    this.maxLength = maxLength
+  }
+
+    enqueue (value) {
+    if (this.checkOverflow()) return
+    if (this.checkEmpty()) {
+      this.front += 1
+      this.rear += 1
+    } else {
+      if (this.rear === this.maxLength) {
+        this.rear = 1
+      } else this.rear += 1
+    }
+    this.queue[this.rear] = value
+  }
+
+    dequeue () {
+    if (this.checkEmpty()) {
+            return
+    }
+    const y = this.queue[this.front]
+    this.queue[this.front] = '*'
+    if (!this.checkSingleelement()) {
+      if (this.front === this.maxLength) this.front = 1
+      else {
+        this.front += 1
+      }
+    }
+
+    return y   }
+
+    checkEmpty () {
+    if (this.front === 0 && this.rear === 0) {
+      return true
+    }
+  }
+
+  checkSingleelement () {
+    if (this.front === this.rear && this.rear !== 0) {
+      this.front = this.rear = 0
+      return true
+    }
+  }
+
+    checkOverflow () {
+    if ((this.front === 1 && this.rear === this.maxLength) || (this.front === this.rear + 1)) {
+            return true
+    }
+  }
+
+    display (output = value => console.log(value)) {
+    for (let index = 1; index < this.queue.length; index++) {
+      output(this.queue[index])
+    }
+  }
+
+    length () {
+    return this.queue.length - 1
+  }
+
+    peek () {
+    return this.queue[this.front]
+  }
+}
+
+
+/
+
+class Stack {
+  constructor () {
+    this.stack = []
+    this.top = 0
+  }
+
+    push (newValue) {
+    this.stack.push(newValue)
+    this.top += 1
+  }
+
+    pop () {
+    if (this.top !== 0) {
+      this.top -= 1
+      return this.stack.pop()
+    }
+    throw new Error('Stack Underflow')
+  }
+
+    get length () {
+    return this.top
+  }
+
+    get isEmpty () {
+    return this.top === 0
+  }
+
+    get last () {
+    if (this.top !== 0) {
+      return this.stack[this.stack.length - 1]
+    }
+    return null
+  }
+
+    static isStack (el) {
+    return el instanceof Stack
+  }
+}
+
+
+/
+
+
+const Stack = (function () {
+  function Stack () {
+        this.top = 0
+        this.stack = []
+  }
+
+    Stack.prototype.push = function (value) {
+    this.stack[this.top] = value
+    this.top++
+  }
+
+    Stack.prototype.pop = function () {
+    if (this.top === 0) {
+      return 'Stack is Empty'
+    }
+
+    this.top--
+    const result = this.stack[this.top]
+    this.stack = this.stack.splice(0, this.top)
+    return result
+  }
+
+    Stack.prototype.size = function () {
+    return this.top
+  }
+
+    Stack.prototype.peek = function () {
+    return this.stack[this.top - 1]
+  }
+
+    Stack.prototype.view = function (output = value => console.log(value)) {
+    for (let i = 0; i < this.top; i++) {
+      output(this.stack[i])
+    }
+  }
+
+  return Stack
+}())
+
+
+
+
+
+
+
+
+/
+
+class Node {
+  constructor (data) {
+    this.data = data
+    this.left = null
+    this.right = null
+  }
+}
+
+class BinaryTree {
+  constructor () {
+    this.root = null
+    this.traversal = []
+  }
+
+  breadthFirst () {
+    const h = this.getHeight(this.root)
+    for (let i = 0; i !== h; i++) {
+      this.traverseLevel(this.root, i)
+    }
+    return this.traversal
+  }
+
+    getHeight (node) {
+    if (node === null) {
+      return 0
+    }
+    const lheight = this.getHeight(node.left)
+    const rheight = this.getHeight(node.right)
+    return lheight > rheight ? lheight + 1 : rheight + 1
+  }
+
+  traverseLevel (node, levelRemaining) {
+    if (node === null) {
+      return
+    }
+    if (levelRemaining === 0) {
+      this.traversal.push(node.data)
+    } else {
+      this.traverseLevel(node.left, levelRemaining - 1)
+      this.traverseLevel(node.right, levelRemaining - 1)
+    }
+  }
+}
+
+
+/
+
+class FenwickTree {
+  constructor (feneickArray, array, n) {
+    for (let i = 1; i <= n; i++) {
+      feneickArray[i] = 0
+    }
+    for (let i = 0; i < n; i++) {
+      this.update(feneickArray, n, i, array[i])
+    }
+  }
+
+  update (feneickArray, n, index, value) {
+    index = index + 1
+    while (index <= n) {
+      feneickArray[index] += value
+      index += index & (-index)
+    }
+  }
+
+  getPrefixSum (feneickArray, index) {
+    let currSum = 0
+    index = index + 1
+    while (index > 0) {
+      currSum += feneickArray[index]
+      index -= index & (-index)
+    }
+
+    return currSum
+  }
+}
+
+/
+
+function traverseDFS (root) {
+  const stack = [root]
+  const res = []
+
+  while (stack.length) {
+    const curr = stack.pop()
+    res.push(curr.key)
+
+    if (curr.right) {
+      stack.push(curr.right)
+    }
+
+    if (curr.left) {
+      stack.push(curr.left)
+    }
+  }
+
+  return res.reverse()
+}
+
+function searchDFS (tree, value) {
+  const stack = []
+
+  stack.push(tree[0])
+
+  while (stack.length !== 0) {
+    for (let i = 0; i < stack.length; i++) {
+      const node = stack.pop()
+
+      if (node.value === value) {
+        return node
+      }
+      if (node.right) {
+        stack.push(tree[node.right])
+      }
+      if (node.left) {
+        stack.push(tree[node.left])
+      }
+    }
+  }
+  return null
+}
+
+const tree = [
+  { value: 6, left: 1, right: 2 },
+  { value: 5, left: 3, right: 4 },
+  { value: 7, left: null, right: 5 },
+  { value: 3, left: 6, right: null },
+  { value: 4, left: null, right: null },
+  { value: 9, left: 7, right: 8 },
+  { value: 2, left: 9, right: null },
+  { value: 8, left: null, right: null },
+  { value: 10, left: null, right: null },
+  { value: 1, left: null, right: null }
+]
+
+searchDFS(tree, 9)
+searchDFS(tree, 10)
+
+traverseDFS(6)
+
+
+
+
+
+
+
+const multipleFactorials = (arr) => arr.map(factorial)
+
+
+
+
+
+
+
+
+
+
+
+
+  if (cache) {
+    const value = cache.get(n)
+
+    if (value !== null) {
+      return value
+    }
+  }
+
+  if (n === 1 || n === 2) {
+    return 1
+  }
+
+  const result = fibonacciCache(n - 1, cache) + fibonacciCache(n - 2, cache)
+
+  cache && cache.set(n, result)
+
+  return result
+}
+
+
+
+  return new Set(
+    sets.reduce((flatArray, set) => [...flatArray, ...set], [])
+  )
+}
+
+const memoize = (func, cache = new Map()) => {
+  const jsonReplacer = (_, value) => {
+    if (value instanceof Set) {       return [...value]
+    }
+
+    if (value instanceof Map) {       return Object.fromEntries(value)
+    }
+
+    return value
+  }
+
+  return (...args) => {
+    /
+    const argsKey = JSON.stringify(args, jsonReplacer)
+
+    /
+    if (cache.has(argsKey)) {
+      return cache.get(argsKey)
+    }
+
+    /
+    const result = func(...args)     cache.set(argsKey, result)
+
+    return result
+  }
+}
+
+
+class LRUCache {
+    #capacity
+
+  /
+  constructor (capacity) {
+    if (!Number.isInteger(capacity) || capacity < 0) {
+      throw new TypeError('Invalid capacity')
+    }
+
+    this.#capacity = ~~capacity
+    this.misses = 0
+    this.hits = 0
+    this.cache = new Map()
+
+    return Object.seal(this)
+  }
+
+  get info () {
+    return Object.freeze({
+      misses: this.misses,
+      hits: this.hits,
+      capacity: this.capacity,
+      size: this.size
+    })
+  }
+
+  get size () {
+    return this.cache.size
+  }
+
+  get capacity () {
+    return this.#capacity
+  }
+
+  set capacity (newCapacity) {
+    if (newCapacity < 0) {
+      throw new RangeError('Capacity should be greater than 0')
+    }
+
+    if (newCapacity < this.capacity) {
+      let diff = this.capacity - newCapacity
+
+      while (diff--) {
+        this.#removeLeastRecentlyUsed()
+      }
+    }
+
+    this.#capacity = newCapacity
+  }
+
+  /
+  #removeLeastRecentlyUsed () {
+    this.cache.delete(this.cache.keys().next().value)
+  }
+
+  /
+  has (key) {
+    key = String(key)
+
+    return this.cache.has(key)
+  }
+
+  /
+  set (key, value) {
+    key = String(key)
+        if (this.size === this.capacity) {
+      this.#removeLeastRecentlyUsed()
+    }
+
+    this.cache.set(key, value)
+  }
+
+  /
+  get (key) {
+    key = String(key)
+        if (this.cache.has(key)) {
+      const value = this.cache.get(key)
+
+            this.cache.delete(key)
+      this.cache.set(key, value)
+
+      this.hits++
+      return value
+    }
+
+    this.misses++
+    return null
+  }
+
+  /
+  parse (json) {
+    const { misses, hits, cache } = JSON.parse(json)
+
+    this.misses += misses ?? 0
+    this.hits += hits ?? 0
+
+    for (const key in cache) {
+      this.set(key, cache[key])
+    }
+
+    return this
+  }
+
+  /
+  toString (indent) {
+    const replacer = (_, value) => {
+      if (value instanceof Set) {
+        return [...value]
+      }
+
+      if (value instanceof Map) {
+        return Object.fromEntries(value)
+      }
+
+      return value
+    }
+
+    return JSON.stringify(this, replacer, indent)
+  }
+}
+
+
+class CacheNode {
+  constructor (key, value, frequency) {
+    this.key = key
+    this.value = value
+    this.frequency = frequency
+
+    return Object.seal(this)
+  }
+}
+
+class FrequencyMap extends Map {
+  static get [Symbol.species] () { return Map }   get [Symbol.toStringTag] () { return '' }
+
+  /
+  refresh (node) {
+    const { frequency } = node
+    const freqSet = this.get(frequency)
+    freqSet.delete(node)
+
+    node.frequency++
+
+    this.insert(node)
+  }
+
+  /
+  insert (node) {
+    const { frequency } = node
+
+    if (!this.has(frequency)) {
+      this.set(frequency, new Set())
+    }
+
+    this.get(frequency).add(node)
+  }
+}
+
+class LFUCache {
+    #capacity
+    #frequencyMap
+
+    /
+    constructor (capacity) {
+      this.#capacity = capacity
+      this.#frequencyMap = new FrequencyMap()
+      this.misses = 0
+      this.hits = 0
+      this.cache = new Map()
+
+      return Object.seal(this)
+    }
+
+    /
+    get capacity () {
+      return this.#capacity
+    }
+
+    /
+    get size () {
+      return this.cache.size
+    }
+
+    /
+    set capacity (newCapacity) {
+      if (this.#capacity > newCapacity) {
+        let diff = this.#capacity - newCapacity 
+        while (diff--) {
+          this.#removeCacheNode()
+        }
+
+        this.cache.size === 0 && this.#frequencyMap.clear()
+      }
+
+      this.#capacity = newCapacity
+    }
+
+    get info () {
+      return Object.freeze({
+        misses: this.misses,
+        hits: this.hits,
+        capacity: this.capacity,
+        currentSize: this.size,
+        leastFrequency: this.leastFrequency
+      })
+    }
+
+    get leastFrequency () {
+      const freqCacheIterator = this.#frequencyMap.keys()
+      let leastFrequency = freqCacheIterator.next().value || null
+
+            while (this.#frequencyMap.get(leastFrequency)?.size === 0) {
+        leastFrequency = freqCacheIterator.next().value
+      }
+
+      return leastFrequency
+    }
+
+    #removeCacheNode () {
+      const leastFreqSet = this.#frequencyMap.get(this.leastFrequency)
+            const LFUNode = leastFreqSet.values().next().value
+
+      leastFreqSet.delete(LFUNode)
+      this.cache.delete(LFUNode.key)
+    }
+
+    /
+    has (key) {
+      key = String(key) 
+      return this.cache.has(key)
+    }
+
+    /
+    get (key) {
+      key = String(key) 
+      if (this.cache.has(key)) {
+        const oldNode = this.cache.get(key)
+        this.#frequencyMap.refresh(oldNode)
+
+        this.hits++
+
+        return oldNode.value
+      }
+
+      this.misses++
+      return null
+    }
+
+    /
+    set (key, value, frequency = 1) {
+      key = String(key) 
+      if (this.#capacity === 0) {
+        throw new RangeError('LFUCache ERROR: The Capacity is 0')
+      }
+
+      if (this.cache.has(key)) {
+        const node = this.cache.get(key)
+        node.value = value
+
+        this.#frequencyMap.refresh(node)
+
+        return this
+      }
+
+            if (this.#capacity === this.cache.size) {
+        this.#removeCacheNode()
+      }
+
+      const newNode = new CacheNode(key, value, frequency)
+
+      this.cache.set(key, newNode)
+      this.#frequencyMap.insert(newNode)
+
+      return this
+    }
+
+    /
+    parse (json) {
+      const { misses, hits, cache } = JSON.parse(json)
+
+      this.misses += misses ?? 0
+      this.hits += hits ?? 0
+
+      for (const key in cache) {
+        const { value, frequency } = cache[key]
+        this.set(key, value, frequency)
+      }
+
+      return this
+    }
+
+    /
+    clear () {
+      this.cache.clear()
+      this.#frequencyMap.clear()
+
+      return this
+    }
+
+    /
+    toString (indent) {
+      const replacer = (_, value) => {
+        if (value instanceof Set) {
+          return [...value]
+        }
+
+        if (value instanceof Map) {
+          return Object.fromEntries(value)
+        }
+
+        return value
+      }
+
+      return JSON.stringify(this, replacer, indent)
+    }
+}
+
+
+const feetToMeter = (feet) => {
+  return feet * 0.3048
+}
+
+const meterToFeet = (meter) => {
+  return meter / 0.3048
+}
+
+
+/
+
+
+const RailwayTimeConversion = (timeString) => {
+    if (typeof timeString !== 'string') {
+    return new TypeError('Argument is not a string.')
+  }
+    const [hour, minute, scondWithShift] = timeString.split(':')
+    const [second, shift] = [scondWithShift.substr(0, 2), scondWithShift.substr(2)]
+    if (shift === 'PM') {
+    if (parseInt(hour) === 12) { return `${hour}:${minute}:${second}` } else { return `${parseInt(hour) + 12}:${minute}:${second}` }
+  } else {
+    if (parseInt(hour) === 12) { return `00:${minute}:${second}` } else { return `${hour}:${minute}:${second}` }
+  }
+}
+
+
+
+
+
+const titleCaseConversion = (inputString) => {
+  if (inputString === '') return ''
+    const stringCollections = inputString.split(' ').map(word => {
+    let firstChar = ''
+        const firstCharCode = word[0].charCodeAt()
+        if (firstCharCode >= 97 && firstCharCode <= 122) {
+            firstChar += String.fromCharCode(firstCharCode - 32)
+    } else {
+            firstChar += word[0]
+    }
+    const newWordChar = word.slice(1).split('').map(char => {
+            const presentCharCode = char.charCodeAt()
+            if (presentCharCode >= 65 && presentCharCode <= 90) {
+                return String.fromCharCode(presentCharCode + 32)
+      }
+            return char
+    })
+        return firstChar + newWordChar.join('')
+  })
+    return stringCollections.join(' ')
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const pad = (num, padlen) => {
+  const pad = new Array(1 + padlen).join(0)
+  return (pad + num).slice(-pad.length)
+}
+
+const hexLookup = (bin) => {
+  let binary = bin
+  if (binary.length < 4) {
+    binary = pad(binary, 4)
+  }
+  switch (binary) {
+    case '0000': return '0'
+    case '0001': return '1'
+    case '0010': return '2'
+    case '0011': return '3'
+    case '0100': return '4'
+    case '0101': return '5'
+    case '0110': return '6'
+    case '0111': return '7'
+    case '1000': return '8'
+    case '1001': return '9'
+    case '1010': return 'A'
+    case '1011': return 'B'
+    case '1100': return 'C'
+    case '1101': return 'D'
+    case '1110': return 'E'
+    case '1111': return 'F'
+  }
+}
+const binaryToHex = (binaryString) => {
+  /
+
+  let result = ''
+  binaryString = binaryString.split('')
+  for (let i = binaryString.length - 1; i >= 0; i = i - 4) {
+    if (i >= 3) {
+      result += hexLookup(binaryString.slice(i - 3, i + 1).join(''))
+    } else {
+      result += hexLookup(binaryString.slice(0, i + 1).join(''))
+    }
+  }
+  return result.split('').reverse().join('')
+}
+
+
+
+
+function bufferToBase64 (binaryData) {
+    const base64Table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    const padding = 3 - (binaryData.byteLength % 3)
+    const byteView = new Uint8Array(binaryData)
+  let result = ''
+
+    for (let i = 0; i < byteView.byteLength; i += 3) {
+        const char1 = (byteView[i] & 252) >> 2
+    const char2 = ((byteView[i] & 3) << 4) + ((byteView[i + 1] & 240) >> 4)
+    const char3 = ((byteView[i + 1] & 15) << 2) + ((byteView[i + 2] & 192) >> 6)
+    const char4 = byteView[i + 2] & 63
+
+    result +=
+        base64Table[char1] +
+        base64Table[char2] +
+        base64Table[char3] +
+        base64Table[char4]
+  }
+
+    if (padding !== 3) {
+    const paddedResult = result.slice(0, result.length - padding) + '='.repeat(padding)
+    return paddedResult
+  }
+
+  return result
+}
+
+
+function RGBToHex (r, g, b) {
+  if (
+    typeof r !== 'number' ||
+    typeof g !== 'number' ||
+    typeof b !== 'number'
+  ) {
+    throw new TypeError('argument is not a Number')
+  }
+
+  const toHex = n => (n || '0').toString(16).padStart(2, '0')
+
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`
+}
+
+
+
+
+/
+
+const isLeap = (year) => {
+  if (year % 400 === 0) return true
+  else if (year % 100 === 0) return false
+  else if (year % 4 === 0) return true
+  else return false
+}
+const DateToDay = (dd, mm, yyyy) => {
+  return Math.floor((365 * (yyyy - 1)) + ((yyyy - 1) / 4) - ((yyyy - 1) / 100) + ((yyyy - 1) / 400) + dd + (((367 * mm) - 362) / 12) + (mm <= 2 ? 0 : isLeap(yyyy) ? -1 : -2))
+}
+
+const DateDayDifference = (date1, date2) => {
+    if (typeof date1 !== 'string' && typeof date2 !== 'string') {
+    return new TypeError('Argument is not a string.')
+  }
+    const [firstDateDay, firstDateMonth, firstDateYear] = date1.split('/').map((ele) => Number(ele))
+    const [secondDateDay, secondDateMonth, secondDateYear] = date2.split('/').map((ele) => Number(ele))
+    if (firstDateDay < 0 || firstDateDay > 31 ||
+        firstDateMonth > 12 || firstDateMonth < 0 ||
+        secondDateDay < 0 || secondDateDay > 31 ||
+        secondDateMonth > 12 || secondDateMonth < 0) {
+    return new TypeError('Date is not valid.')
+  }
+  return Math.abs(DateToDay(secondDateDay, secondDateMonth, secondDateYear) - DateToDay(firstDateDay, firstDateMonth, firstDateYear))
+}
+
+
+
+const binLookup = (key) => ({
+  0: '0000',
+  1: '0001',
+  2: '0010',
+  3: '0011',
+  4: '0100',
+  5: '0101',
+  6: '0110',
+  7: '0111',
+  8: '1000',
+  9: '1001',
+  a: '1010',
+  b: '1011',
+  c: '1100',
+  d: '1101',
+  e: '1110',
+  f: '1111'
+}[key.toLowerCase()]) 
+const hexToBinary = (hexString) => {
+  if (typeof hexString !== 'string') {
+    throw new TypeError('Argument is not a string type')
+  }
+
+  if (/[^\da-f]/gi.) {
+    throw new Error('Argument is not a valid HEX code!')
+  }
+  /
+
+  return hexString.replace(
+    /[0-9a-f]/gi,
+    lexeme => binLookup(lexeme)
+  )
+}
+
+
+/
+
+const values = {
+  M: 1000,
+  CM: 900,
+  D: 500,
+  CD: 400,
+  C: 100,
+  XC: 90,
+  L: 50,
+  XL: 40,
+  X: 10,
+  IX: 9,
+  V: 5,
+  IV: 4,
+  I: 1
+}
+
+const orders = [
+  'M',
+  'CM',
+  'D',
+  'CD',
+  'C',
+  'XC',
+  'L',
+  'XL',
+  'X',
+  'IX',
+  'V',
+  'IV',
+  'I'
+]
+
+function decimalToRoman (num) {
+  let roman = ''
+  for (const symbol of orders) {
+    while (num >= values[symbol]) {
+      roman += symbol
+      num -= values[symbol]
+    }
+  }
+  return roman
+}
+
+
+const values = {
+  I: 1,
+  V: 5,
+  X: 10,
+  L: 50,
+  C: 100,
+  D: 500,
+  M: 1000
+}
+
+
+  let prev = ' '
+
+  let sum = 0
+
+  let newPrev = 0
+  for (let i = romanNumber.length - 1; i >= 0; i--) {
+    const c = romanNumber.charAt(i)
+
+    if (prev !== ' ') {
+      newPrev = values[prev] > newPrev ? values[prev] : newPrev
+    }
+
+    const currentNum = values[c]
+    if (currentNum >= newPrev) {
+      sum += currentNum
+    } else {
+      sum -= currentNum
+    }
+
+    prev = c
+  }
+  return sum
+}
+
+
+function base64ToBuffer (b64) {
+    const base64Table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    const paddingIdx = b64.indexOf('=')
+    const b64NoPadding = paddingIdx !== -1 ? b64.slice(0, paddingIdx) : b64
+    const bufferLength = Math.floor((b64NoPadding.length * 6) / 8)
+    const result = new ArrayBuffer(bufferLength)
+    const byteView = new Uint8Array(result)
+
+    for (let i = 0, j = 0; i < b64NoPadding.length; i += 4, j += 3) {
+        const b64Char1 = base64Table.indexOf(b64NoPadding[i])
+    const b64Char2 = base64Table.indexOf(b64NoPadding[i + 1])
+    let b64Char3 = base64Table.indexOf(b64NoPadding[i + 2])
+    let b64Char4 = base64Table.indexOf(b64NoPadding[i + 3])
+
+        if (b64Char3 === -1) b64Char3 = 0
+    if (b64Char4 === -1) b64Char4 = 0
+
+        const byte1 = (b64Char1 << 2) + ((b64Char2 & 48) >> 4)
+    const byte2 = ((b64Char2 & 15) << 4) + ((b64Char3 & 60) >> 2)
+    const byte3 = ((b64Char3 & 3) << 6) + b64Char4
+
+    byteView[j] = byte1
+    byteView[j + 1] = byte2
+    byteView[j + 2] = byte3
+  }
+
+  return result
+}
+
+
+function octalToDecimal (num) {
+  let dec = 0
+  let base = 1
+  while (num > 0) {
+    const r = num % 10
+    num = Math.floor(num / 10)
+    dec = dec + (r * base)
+    base = base * 8
+  }
+  return dec
+}
+
+
+
+
+function hexToInt (hexNum) {
+  const numArr = hexNum.split('')   return numArr.map((item, index) => {
+    switch (item) {
+      case 'A': return 10
+      case 'B': return 11
+      case 'C': return 12
+      case 'D': return 13
+      case 'E': return 14
+      case 'F': return 15
+      default: return parseInt(item)
+    }
+  })
+}
+
+function hexToDecimal (hexNum) {
+  const intItemsArr = hexToInt(hexNum)
+  return intItemsArr.reduce((accumulator, current, index) => {
+    return accumulator + (current * Math.pow(16, (intItemsArr.length - (1 + index))))
+  }, 0)
+}
+
+
+function intToHex (num) {
+  switch (num) {
+    case 10: return 'A'
+    case 11: return 'B'
+    case 12: return 'C'
+    case 13: return 'D'
+    case 14: return 'E'
+    case 15: return 'F'
+  }
+  return num
+}
+
+function decimalToHex (num) {
+  const hexOut = []
+  while (num > 15) {
+    hexOut.unshift(intToHex(num % 16))
+    num = Math.floor(num / 16)
+  }
+  return intToHex(num) + hexOut.join('')
+}
+
+
+/
+
+
+const upperCaseConversion = (inputString) => {
+    const newString = inputString.split('').map(char => {
+        const presentCharCode = char.charCodeAt()
+        if (presentCharCode >= 97 && presentCharCode <= 122) {
+            return String.fromCharCode(presentCharCode - 32)
+    }
+        return char
+  })
+    return newString.join('')
+}
+
+
+function decimalToOctal (num) {
+  let oct = 0
+  let c = 0
+  while (num > 0) {
+    const r = num % 8
+    oct = oct + (r * Math.pow(10, c++))
+    num = Math.floor(num / 8)   }
+  return oct
+}
+
+
+
+
+
+
+
+
+const convertArbitraryBase = (stringInBaseOne, baseOneCharacters, baseTwoCharacters) => {
+  if ([stringInBaseOne, baseOneCharacters, baseTwoCharacters].map(arg => typeof arg).some(type => type !== 'string')) {
+    throw new TypeError('Only string arguments are allowed')
+  }
+  [baseOneCharacters, baseTwoCharacters].forEach(baseString => {
+    const charactersInBase = [...baseString]
+    if (charactersInBase.length !== new Set(charactersInBase).size) {
+      throw new TypeError('Duplicate characters in character set are not allowed')
+    }
+  })
+  const reversedStringOneChars = [...stringInBaseOne].reverse()
+  const stringOneBase = baseOneCharacters.length
+  let value = 0
+  let placeValue = 1
+  for (const digit of reversedStringOneChars) {
+    const digitNumber = baseOneCharacters.indexOf(digit)
+    if (digitNumber === -1) {
+      throw new TypeError(`Not a valid character: ${digit}`)
+    }
+    value += (digitNumber * placeValue)
+    placeValue *= stringOneBase
+  }
+  let stringInBaseTwo = ''
+  const stringTwoBase = baseTwoCharacters.length
+  while (value > 0) {
+    const remainder = value % stringTwoBase
+    stringInBaseTwo = baseTwoCharacters.charAt(remainder) + stringInBaseTwo
+    value /= stringTwoBase
+  }
+  const baseTwoZero = baseTwoCharacters.charAt(0)
+  return stringInBaseTwo.replace(new RegExp(`^${baseTwoZero}+`), '')
+}
+
+
+
+
+
+/
+
+
+const LowerCaseConversion = (inputString) => {
+    const newString = inputString.split('').map(char => {
+        const presentCharCode = char.charCodeAt()
+        if (presentCharCode >= 65 && presentCharCode <= 90) {
+            return String.fromCharCode(presentCharCode + 32)
+    }
+        return char
+  })
+    return newString.join('')
+}
+
+
+
+const celsiusToFahrenheit = (celsius) => {
+      return Math.round(((celsius) * 9 / 5) + 32)
+}
+
+const celsiusToKelvin = (celsius) => {
+      return Math.round((celsius) + 273.15)
+}
+
+const celsiusToRankine = (celsius) => {
+      return Math.round(((celsius) * 9 / 5) + 491.67)
+}
+
+const fahrenheitToCelsius = (fahrenheit) => {
+      return Math.round(((fahrenheit) - 32) * 5 / 9)
+}
+
+const fahrenheitToKelvin = (fahrenheit) => {
+      return Math.round((((fahrenheit) - 32) * 5 / 9) + 273.15)
+}
+
+const fahrenheitToRankine = (fahrenheit) => {
+      return Math.round((fahrenheit) + 459.67)
+}
+
+const kelvinToCelsius = (kelvin) => {
+      return Math.round((kelvin) - 273.15)
+}
+
+const kelvinToFahrenheit = (kelvin) => {
+      return Math.round((((kelvin) - 273.15) * 9 / 5) + 32)
+}
+
+const kelvinToRankine = (kelvin) => {
+      return Math.round(((kelvin) * 9 / 5))
+}
+
+const rankineToCelsius = (rankine) => {
+      return Math.round(((rankine) - 491.67) * 5 / 9)
+}
+
+const rankineToFahrenheit = (rankine) => {
+      return Math.round((rankine) - 459.67)
+}
+
+const rankineToKelvin = (rankine) => {
+      return Math.round(((rankine) * 5 / 9))
+}
+
+const reaumurToKelvin = (reaumur) => {
+    return Math.round(((reaumur) * 1.25 + 273.15))
+}
+
+const reaumurToFahrenheit = (reaumur) => {
+    return Math.round(((reaumur) * 2.25 + 32))
+}
+
+const reaumurToCelsius = (reaumur) => {
+    return Math.round(((reaumur) * 1.25))
+}
+
+const reaumurToRankine = (reaumur) => {
+    return Math.round(((reaumur) * 2.25 + 32 + 459.67))
+}
+
+
+  celsiusToFahrenheit, celsiusToKelvin, celsiusToRankine,
+  fahrenheitToCelsius, fahrenheitToKelvin, fahrenheitToRankine,
+  kelvinToCelsius, kelvinToFahrenheit, kelvinToRankine,
+  rankineToCelsius, rankineToFahrenheit, rankineToKelvin,
+  reaumurToCelsius, reaumurToFahrenheit, reaumurToKelvin, reaumurToRankine
+}
+/
+
+const calcMonthList = {
+  1: 11,
+  2: 12,
+  3: 1,
+  4: 2,
+  5: 3,
+  6: 4,
+  7: 5,
+  8: 6,
+  9: 7,
+  10: 8,
+  11: 9,
+  12: 10
+}
+
+const daysNameList = {   0: 'Sunday',
+  1: 'Monday',
+  2: 'Tuesday',
+  3: 'Wednesday',
+  4: 'Thursday',
+  5: 'Friday',
+  6: 'Saturday'
+}
+
+const DateToDay = (date) => {
+    if (typeof date !== 'string') {
+    return new TypeError('Argument is not a string.')
+  }
+    const [day, month, year] = date.split('/').map((x) => Number(x))
+    if (day < 0 || day > 31 || month > 12 || month < 0) {
+    return new TypeError('Date is not valid.')
+  }
+    const yearDigit = (year % 100)
+  const century = Math.floor(year / 100)
+    const weekDay = Math.abs((day + Math.floor((2.6 * calcMonthList[month]) - 0.2) - (2 * century) + yearDigit + Math.floor(yearDigit / 4) + Math.floor(century / 4)) % 7)
+    return daysNameList[weekDay]
+}
+
+
+
+function hexStringToRGB (hexString) {
+  let r = hexString.substring(0, 2)
+  let g = hexString.substring(2, 4)
+  let b = hexString.substring(4, 6)
+
+  r = parseInt(r, 16)
+  g = parseInt(g, 16)
+  b = parseInt(b, 16)
+  const obj = { r, g, b }
+
+  return obj
+}
+
+
+
+/
+
+
+
+  if (hue < 0 || hue > 360) {
+    throw new Error('hue should be between 0 and 360')
+  }
+
+  if (saturation < 0 || saturation > 1) {
+    throw new Error('saturation should be between 0 and 1')
+  }
+
+  if (value < 0 || value > 1) {
+    throw new Error('value should be between 0 and 1')
+  }
+
+  const chroma = value * saturation
+  const hueSection = hue / 60
+  const secondLargestComponent = chroma * (1 - Math.abs(hueSection % 2 - 1))
+  const matchValue = value - chroma
+
+  return getRgbBySection(hueSection, chroma, matchValue, secondLargestComponent)
+}
+
+
+
+  if (red < 0 || red > 255) {
+    throw new Error('red should be between 0 and 255')
+  }
+
+  if (green < 0 || green > 255) {
+    throw new Error('green should be between 0 and 255')
+  }
+
+  if (blue < 0 || blue > 255) {
+    throw new Error('blue should be between 0 and 255')
+  }
+
+  const dRed = red / 255
+  const dGreen = green / 255
+  const dBlue = blue / 255
+  const value = Math.max(Math.max(dRed, dGreen), dBlue)
+  const chroma = value - Math.min(Math.min(dRed, dGreen), dBlue)
+  const saturation = value === 0 ? 0 : chroma / value
+  let hue
+
+  if (chroma === 0) {
+    hue = 0
+  } else if (value === dRed) {
+    hue = 60 * ((dGreen - dBlue) / chroma)
+  } else if (value === dGreen) {
+    hue = 60 * (2 + (dBlue - dRed) / chroma)
+  } else {
+    hue = 60 * (4 + (dRed - dGreen) / chroma)
+  }
+
+  hue = (hue + 360) % 360
+
+  return [hue, saturation, value]
+}
+
+
+  const bHue = Math.abs(hsv1[0] - hsv2[0]) < 0.2
+  const bSaturation = Math.abs(hsv1[1] - hsv2[1]) < 0.002
+  const bValue = Math.abs(hsv1[2] - hsv2[2]) < 0.002
+
+  return bHue && bSaturation && bValue
+}
+
+function getRgbBySection (hueSection, chroma, matchValue, secondLargestComponent) {
+  function convertToInt (input) {
+    return Math.round(255 * input)
+  }
+
+  let red
+  let green
+  let blue
+
+  if (hueSection >= 0 && hueSection <= 1) {
+    red = convertToInt(chroma + matchValue)
+    green = convertToInt(secondLargestComponent + matchValue)
+    blue = convertToInt(matchValue)
+  } else if (hueSection > 1 && hueSection <= 2) {
+    red = convertToInt(secondLargestComponent + matchValue)
+    green = convertToInt(chroma + matchValue)
+    blue = convertToInt(matchValue)
+  } else if (hueSection > 2 && hueSection <= 3) {
+    red = convertToInt(matchValue)
+    green = convertToInt(chroma + matchValue)
+    blue = convertToInt(secondLargestComponent + matchValue)
+  } else if (hueSection > 3 && hueSection <= 4) {
+    red = convertToInt(matchValue)
+    green = convertToInt(secondLargestComponent + matchValue)
+    blue = convertToInt(chroma + matchValue)
+  } else if (hueSection > 4 && hueSection <= 5) {
+    red = convertToInt(secondLargestComponent + matchValue)
+    green = convertToInt(matchValue)
+    blue = convertToInt(chroma + matchValue)
+  } else {
+    red = convertToInt(chroma + matchValue)
+    green = convertToInt(matchValue)
+    blue = convertToInt(secondLargestComponent + matchValue)
+  }
+
+  return [red, green, blue]
+}
+function decimalToBinary (num) {
+  const bin = []
+  while (num > 0) {
+    bin.unshift(num % 2)
+    num >>= 1   }
+  return bin.join('')
+}
+
+
+
+
+
+
+  let decimalNumber = 0
+  const binaryDigits = binaryString.split('').reverse()   binaryDigits.forEach((binaryDigit, index) => {
+    decimalNumber += binaryDigit * (Math.pow(2, index))   })
+  return decimalNumber
+}
+/
+
+const swap = (arr, i, j) => {
+  const newArray = [...arr];
+
+  [newArray[i], newArray[j]] = [newArray[j], newArray[i]] 
+  return newArray
+}
+
+const permutations = arr => {
+  const P = []
+  const permute = (arr, low, high) => {
+    if (low === high) {
+      P.push([...arr])
+      return P
+    }
+    for (let i = low; i <= high; i++) {
+      arr = swap(arr, low, i)
+      permute(arr, low + 1, high)
+    }
+    return P
+  }
+  return permute(arr, 0, arr.length - 1)
+}
+
+
+class NQueen {
+  constructor (size) {
+    this.board = new Array(size).fill('.').map(() => new Array(size).fill('.'))
+    this.size = size
+    this.solutionCount = 0
+  }
+
+  isValid ([row, col]) {
+    
+        for (let i = 0; i < col; i++) {
+      if (this.board[row][i] === 'Q') return false
+    }
+
+        for (let i = row, j = col; i >= 0 && j >= 0; i--, j--) {
+      if (this.board[i][j] === 'Q') return false
+    }
+
+        for (let i = row, j = col; j >= 0 && i < this.size; i++, j--) {
+      if (this.board[i][j] === 'Q') return false
+    }
+
+    return true
+  }
+
+  placeQueen (row, col) {
+    this.board[row][col] = 'Q'
+  }
+
+  removeQueen (row, col) {
+    this.board[row][col] = '.'
+  }
+
+  solve (col = 0) {
+    if (col >= this.size) {
+      this.solutionCount++
+      return true
+    }
+
+    for (let i = 0; i < this.size; i++) {
+      if (this.isValid([i, col])) {
+        this.placeQueen(i, col)
+        this.solve(col + 1)
+        this.removeQueen(i, col)
+      }
+    }
+
+    return false
+  }
+
+  printBoard (output = value => console.log(value)) {
+    if (!output._isMockFunction) {
+      output('\n')
+    }
+    for (const row of this.board) {
+      output(row)
+    }
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+const data = [
+  [3, 0, 6, 5, 0, 8, 4, 0, 0],
+  [5, 2, 0, 0, 0, 0, 0, 0, 0],
+  [0, 8, 7, 0, 0, 0, 0, 3, 1],
+  [0, 0, 3, 0, 1, 0, 0, 8, 0],
+  [9, 0, 0, 8, 6, 3, 0, 0, 5],
+  [0, 5, 0, 0, 9, 0, 6, 0, 0],
+  [1, 3, 0, 0, 0, 0, 2, 5, 0],
+  [0, 0, 0, 0, 0, 0, 0, 7, 4],
+  [0, 0, 5, 2, 0, 6, 3, 0, 0]
+]
+
+const solved = [
+  [3, 1, 6, 5, 7, 8, 4, 9, 2],
+  [5, 2, 9, 1, 3, 4, 7, 6, 8],
+  [4, 8, 7, 6, 2, 9, 5, 3, 1],
+  [2, 6, 3, 4, 1, 5, 9, 8, 7],
+  [9, 7, 4, 8, 6, 3, 1, 2, 5],
+  [8, 5, 1, 7, 9, 2, 6, 4, 3],
+  [1, 3, 8, 9, 4, 7, 2, 5, 6],
+  [6, 9, 2, 3, 5, 1, 8, 7, 4],
+  [7, 4, 5, 2, 8, 6, 3, 1, 9]
+]
+
+
+
+
+
+
+
+
+
+
+
+class Sudoku {
+    constructor (board) {
+    this.board = board
+  }
+
+  findEmptyCell () {
+        for (let i = 0; i < 9; i++) {
+      for (let j = 0; j < 9; j++) {
+        if (this.board[i][j] === 0) return [i, j]
+      }
+    }
+    return [-1, -1]
+  }
+
+  check ([y, x], value) {
+    
+        for (let i = 0; i < 9; i++) {
+      if (this.board[i][x] === value) return false
+    }
+        for (let i = 0; i < 9; i++) {
+      if (this.board[y][i] === value) return false
+    }
+
+        const secRow = Math.floor(y / 3)
+    const secCol = Math.floor(x / 3)
+    for (let i = (secRow * 3); i < ((secRow * 3) + 3); i++) {
+      for (let j = (secCol * 3); j < ((secCol * 3) + 3); j++) {
+        if (y !== i && x !== j && this.board[i][j] === value) return false
+      }
+    }
+
+    return true
+  }
+
+  solve () {
+    const [y, x] = this.findEmptyCell()
+
+        if (y === -1 && x === -1) return true
+
+    for (let val = 1; val < 10; val++) {
+      if (this.check([y, x], val)) {
+        this.board[y][x] = val
+        if (this.solve()) return true
+                this.board[y][x] = 0
+      }
+    }
+        return false
+  }
+
+  getSection (row, [start, end]) {
+    return this.board[row].slice(start, end)
+  }
+
+  printBoard (output = (...v) => console.log(...v)) {
+        for (let i = 0; i < 9; i++) {
+      if (i % 3 === 0 && i !== 0) {
+        output('- - - - - - - - - - - -')
+      }
+      output(
+        ...this.getSection(i, [0, 3]), ' | ',
+        ...this.getSection(i, [3, 6]), ' | ',
+        ...this.getSection(i, [6, 9]))
+    }
+  }
+}
+
+
+/
+
+
+function validateGrid (grid) {
+  if (!Array.isArray(grid) || grid.length === 0) throw new TypeError('Grid must be a non-empty array')
+
+  const allRowsHaveCorrectLength = grid.every(row => row.length === grid.length)
+  if (!allRowsHaveCorrectLength) throw new TypeError('Grid must be a square')
+
+  const allCellsHaveValidValues = grid.every(row => {
+    return row.every(cell => cell === 0 || cell === 1)
+  })
+  if (!allCellsHaveValidValues) throw new TypeError('Grid must only contain 0s and 1s')
+}
+
+function isSafe (grid, x, y) {
+  const n = grid.length
+  return x >= 0 && x < n && y >= 0 && y < n && grid[y][x] === 1
+}
+
+
+function getPathPart (grid, x, y, solution, path) {
+  const n = grid.length
+
+    if (x === n - 1 && y === n - 1 && grid[y][x] === 1) {
+    solution[y][x] = 1
+    return path
+  }
+
+    if (!isSafe(grid, x, y)) return false
+
+    if (solution[y][x] === 1) return false
+
+  
+    solution[y][x] = 1
+
+    const right = getPathPart(grid, x + 1, y, solution, path + 'R')
+  if (right) return right
+
+    const down = getPathPart(grid, x, y + 1, solution, path + 'D')
+  if (down) return down
+
+    const up = getPathPart(grid, x, y - 1, solution, path + 'U')
+  if (up) return up
+
+    const left = getPathPart(grid, x - 1, y, solution, path + 'L')
+  if (left) return left
+
+    solution[y][x] = 0
+  return false
+}
+
+function getPath (grid) {
+    const n = grid.length
+
+    const solution = []
+  for (let i = 0; i < n; i++) {
+    const row = Array(n)
+    row.fill(0)
+    solution[i] = row
+  }
+
+  return getPathPart(grid, 0, 0, solution, '')
+}
+
+
+
+  constructor (grid) {
+        validateGrid(grid)
+
+        const solution = getPath(grid)
+
+    if (solution !== false) {
+      this.path = solution
+      this.solved = true
+    } else {
+      this.path = ''
+      this.solved = false
+    }
+  }
+}
+/
+
+class Combinations {
+  constructor (n, k) {
+    this.n = n
+    this.k = k
+    this.current = []     this.combinations = []
+  }
+
+  findCombinations (high = this.n, total = this.k, low = 1) {
+    if (total === 0) {
+      this.combinations.push([...this.current])
+      return this.combinations
+    }
+    for (let i = low; i <= high; i++) {
+      this.current.push(i)
+      this.findCombinations(high, total - 1, i + 1)
+      this.current.pop()
+    }
+    return this.combinations
+  }
+}
+
+
+/
+
+/
+const sumOfSubset = (set, subset, setindex, sum, targetSum) => {
+        if (sum === targetSum) return [subset]
+
+      if (sum > targetSum) return []
+
+    let results = []
+
+        set.slice(setindex).forEach((num, index) => {
+        const nextSubset = [...subset, num]
+
+            const nextSetIndex = setindex + index + 1
+
+        const nextSum = sum + num
+
+        const subsetResult = sumOfSubset(
+      set,
+      nextSubset,
+      nextSetIndex,
+      nextSum,
+      targetSum
+    )
+
+        results = [...results, ...subsetResult]
+  })
+
+    return results
+}
+
+
+
+class OpenKnightTour {
+  constructor (size) {
+    this.board = new Array(size).fill(0).map(() => new Array(size).fill(0))
+    this.size = size
+  }
+
+  getMoves ([i, j]) {
+        const moves = [
+      [i + 2, j - 1],
+      [i + 2, j + 1],
+      [i - 2, j - 1],
+      [i - 2, j + 1],
+      [i + 1, j - 2],
+      [i + 1, j + 2],
+      [i - 1, j - 2],
+      [i - 1, j + 2]
+    ]
+
+    return moves.filter(([y, x]) => y >= 0 && y < this.size && x >= 0 && x < this.size)
+  }
+
+  isComplete () {
+        return !this.board.map(row => row.includes(0)).includes(true)
+  }
+
+  solve () {
+        for (let i = 0; i < this.size; i++) {
+      for (let j = 0; j < this.size; j++) {
+        if (this.solveHelper([i, j], 0)) return true
+      }
+    }
+    return false
+  }
+
+  solveHelper ([i, j], curr) {
+        if (this.isComplete()) return true
+
+    for (const [y, x] of this.getMoves([i, j])) {
+      if (this.board[y][x] === 0) {
+        this.board[y][x] = curr + 1
+        if (this.solveHelper([y, x], curr + 1)) return true
+                this.board[y][x] = 0
+      }
+    }
+    return false
+  }
+
+  printBoard (output = value => console.log(value)) {
+        for (const row of this.board) {
+      let string = ''
+      for (const elem of row) {
+        string += elem + '\t'
+      }
+      output(string)
+    }
+  }
+}
+
+
+/
+
+
+
+  const nextGeneration = []
+  for (let i = 0; i < cells.length; i++) {
+    const nextGenerationRow = []
+    for (let j = 0; j < cells[i].length; j++) {
+            let neighbourCount = 0
+      if (i > 0 && j > 0) neighbourCount += cells[i - 1][j - 1]
+      if (i > 0) neighbourCount += cells[i - 1][j]
+      if (i > 0 && j < cells[i].length - 1) neighbourCount += cells[i - 1][j + 1]
+      if (j > 0) neighbourCount += cells[i][j - 1]
+      if (j < cells[i].length - 1) neighbourCount += cells[i][j + 1]
+      if (i < cells.length - 1 && j > 0) neighbourCount += cells[i + 1][j - 1]
+      if (i < cells.length - 1) neighbourCount += cells[i + 1][j]
+      if (i < cells.length - 1 && j < cells[i].length - 1) neighbourCount += cells[i + 1][j + 1]
+
+            const alive = cells[i][j] === 1
+      if ((alive && neighbourCount >= 2 && neighbourCount <= 3) || (!alive && neighbourCount === 3)) {
+        nextGenerationRow.push(1)
+      } else {
+        nextGenerationRow.push(0)
+      }
+    }
+    nextGeneration.push(nextGenerationRow)
+  }
+  return nextGeneration
+}
+
+
+
+
+
+  if (n === 1) {
+    output.push(`Move disk 1 from rod ${from} to rod ${to}`)
+    return output
+  }
+  TowerOfHanoi(n - 1, from, aux, to, output)
+  output.push(`Move disk ${n} from rod ${from} to rod ${to}`)
+  TowerOfHanoi(n - 1, aux, to, from, output)
+  return output
+}
+
+
+function euclideanGCDRecursive (first, second) {
+  /
+  if (second === 0) {
+    return first
+  } else {
+    return euclideanGCDRecursive(second, (first % second))
+  }
+}
+
+function euclideanGCDIterative (first, second) {
+  /
+  while (second !== 0) {
+    const temp = second
+    second = first % second
+    first = temp
+  }
+  return first
+}
+
+
+
+
+
+function getKochSnowflake (canvasWidth = 600, steps = 5) {
+  if (canvasWidth <= 0) {
+    throw new Error('canvasWidth should be greater than zero')
+  }
+
+  const offsetX = canvasWidth / 10.0
+  const offsetY = canvasWidth / 3.7
+  const vector1 = new Vector2(offsetX, offsetY)
+  const vector2 = new Vector2(canvasWidth / 2, Math.sin(Math.PI / 3) * canvasWidth * 0.8 + offsetY)
+  const vector3 = new Vector2(canvasWidth - offsetX, offsetY)
+  const initialVectors = []
+  initialVectors.push(vector1)
+  initialVectors.push(vector2)
+  initialVectors.push(vector3)
+  initialVectors.push(vector1)
+  const vectors = iterate(initialVectors, steps)
+  return drawToCanvas(vectors, canvasWidth, canvasWidth)
+}
+
+
+function drawToCanvas (vectors, canvasWidth, canvasHeight) {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvasWidth
+  canvas.height = canvasHeight
+
+    const ctx = canvas.getContext('2d')
+  ctx.beginPath()
+  ctx.moveTo(vectors[0].x, vectors[0].y)
+  for (let i = 1; i < vectors.length; i++) {
+    ctx.lineTo(vectors[i].x, vectors[i].y)
+  }
+  ctx.stroke()
+
+  return canvas
+}
+
+if (typeof window !== 'undefined') {
+  const canvas = getKochSnowflake()
+  document.body.append(canvas)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const black = [0, 0, 0]
+const green = [0, 255, 0]
+const violet = [255, 0, 255]
+const white = [255, 255, 255]
+const orange = [255, 128, 0]
+
+
+
+
+function testBreadthFirst (fillLocation, targetColor, replacementColor, testLocation) {
+  const rgbData = generateTestRgbData()
+  breadthFirstSearch(rgbData, fillLocation, targetColor, replacementColor)
+  return rgbData[testLocation[0]][testLocation[1]]
+}
+
+
+function testDepthFirst (fillLocation, targetColor, replacementColor, testLocation) {  const rgbData = generateTestRgbData()
+  depthFirstSearch(rgbData, fillLocation, targetColor, replacementColor)
+  return rgbData[testLocation[0]][testLocation[1]]
+}
+
+
+function generateTestRgbData () {
+  const layout = [
+    [violet, violet, green, green, black, green, green],
+    [violet, green, green, black, green, green, green],
+    [green, green, green, black, green, green, green],
+    [black, black, green, black, white, white, green],
+    [violet, violet, black, violet, violet, white, white],
+    [green, green, green, violet, violet, violet, violet],
+    [violet, violet, violet, violet, violet, violet, violet]
+  ]
+
+    const transposed = []
+  for (let x = 0; x < layout[0].length; x++) {
+    transposed[x] = []
+    for (let y = 0; y < layout.length; y++) {
+      transposed[x][y] = layout[y][x]
+    }
+  }
+
+  return transposed
+}
+
+
+
+
+
+const palindrome = (str) => {
+  if (typeof str !== 'string') {
+    throw new TypeError('Invalid Input')
+  }
+
+  if (str.length <= 1) {
+    return true
+  }
+
+  if (str[0] !== str[str.length - 1]) {
+    return false
+  } else {
+    return palindrome(str.slice(1, str.length - 1))
+  }
+}
+
+
+/
+
+
+  if (low <= str.length && str.length !== 0) {
+    output.push(seq)
+  }
+  for (let i = low; i < str.length; i++) {
+    subsequence(str, seq + str[i], i + 1, output)
+  }
+  return output
+}
+
+
+const neighbors = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+
+
+
+  if (location[0] < 0 ||
+    location[0] >= rgbData.length ||
+    location[1] < 0 ||
+    location[1] >= rgbData[0].length) {
+    throw new Error('location should point to a pixel within the rgbData')
+  }
+
+  const queue = []
+  queue.push(location)
+
+  while (queue.length > 0) {
+    breadthFirstFill(rgbData, location, targetColor, replacementColor, queue)
+  }
+}
+
+
+
+  if (location[0] < 0 ||
+    location[0] >= rgbData.length ||
+    location[1] < 0 ||
+    location[1] >= rgbData[0].length) {
+    throw new Error('location should point to a pixel within the rgbData')
+  }
+
+  depthFirstFill(rgbData, location, targetColor, replacementColor)
+}
+
+
+function breadthFirstFill (rgbData, location, targetColor, replacementColor, queue) {
+  const currentLocation = queue[0]
+  queue.shift()
+
+  if (rgbData[currentLocation[0]][currentLocation[1]] === targetColor) {
+    rgbData[currentLocation[0]][currentLocation[1]] = replacementColor
+
+    for (let i = 0; i < neighbors.length; i++) {
+      const x = currentLocation[0] + neighbors[i][0]
+      const y = currentLocation[1] + neighbors[i][1]
+      if (x >= 0 && x < rgbData.length && y >= 0 && y < rgbData[0].length) {
+        queue.push([x, y])
+      }
+    }
+  }
+}
+
+
+function depthFirstFill (rgbData, location, targetColor, replacementColor) {
+  if (rgbData[location[0]][location[1]] === targetColor) {
+    rgbData[location[0]][location[1]] = replacementColor
+
+    for (let i = 0; i < neighbors.length; i++) {
+      const x = location[0] + neighbors[i][0]
+      const y = location[1] + neighbors[i][1]
+      if (x >= 0 && x < rgbData.length && y >= 0 && y < rgbData[0].length) {
+        depthFirstFill(rgbData, [x, y], targetColor, replacementColor)
+      }
+    }
+  }
+}
+
+
+
+const binarySearch = (arr, searchValue, low = 0, high = arr.length - 1) => {
+    if (high < low || arr.length === 0) return -1
+
+  const mid = low + Math.floor((high - low) / 2)
+
+    if (arr[mid] === searchValue) {
+    return mid
+  }
+
+      if (arr[mid] > searchValue) {
+    return binarySearch(arr, searchValue, low, mid - 1)
+  }
+
+    return binarySearch(arr, searchValue, mid + 1, high)
+}
+
+
+
+
+
+
+  constructor (x, y) {
+    this.x = x
+    this.y = y
+  }
+
+  /
+  add (vector) {
+    const x = this.x + vector.x
+    const y = this.y + vector.y
+    return new Vector2(x, y)
+  }
+
+  /
+  subtract (vector) {
+    const x = this.x - vector.x
+    const y = this.y - vector.y
+    return new Vector2(x, y)
+  }
+
+  /
+  multiply (scalar) {
+    const x = this.x * scalar
+    const y = this.y * scalar
+    return new Vector2(x, y)
+  }
+
+  /
+  rotate (angleInDegrees) {
+    const radians = angleInDegrees * Math.PI / 180
+    const ca = Math.cos(radians)
+    const sa = Math.sin(radians)
+    const x = ca * this.x - sa * this.y
+    const y = sa * this.x + ca * this.y
+    return new Vector2(x, y)
+  }
+}
+
+
+
+  let vectors = initialVectors
+  for (let i = 0; i < steps; i++) {
+    vectors = iterationStep(vectors)
+  }
+
+  return vectors
+}
+
+
+function iterationStep (vectors) {
+  const newVectors = []
+  for (let i = 0; i < vectors.length - 1; i++) {
+    const startVector = vectors[i]
+    const endVector = vectors[i + 1]
+    newVectors.push(startVector)
+    const differenceVector = endVector.subtract(startVector).multiply(1 / 3)
+    newVectors.push(startVector.add(differenceVector))
+    newVectors.push(startVector.add(differenceVector).add(differenceVector.rotate(60)))
+    newVectors.push(startVector.add(differenceVector.multiply(2)))
+  }
+
+  newVectors.push(vectors[vectors.length - 1])
+  return newVectors
+}
+/
+
+
+  if (num === 0 || num === 1) {
+    return String(num)
+  }
+  return binaryEquivalent(Math.floor(num / 2)) + String(num % 2)
+}
+
+
+const factorial = (n) => {
+  if (n === 0) {
+    return 1
+  }
+  return n * factorial(n - 1)
+}
+
+
+
+
+
+const fibonacci = (n) => {
+  if (n < 2) {
+    return n
+  }
+  return fibonacci(n - 2) + fibonacci(n - 1)
+}
+
+
+
+const haversineDistance = (latitude1 = 0, longitude1 = 0, latitude2 = 0, longitude2 = 0) => {
+  validateLatOrLong(latitude1)
+  validateLatOrLong(latitude2)
+  validateLatOrLong(longitude1)
+  validateLatOrLong(longitude2)
+  const earthRadius = 6371e3   const pi = Math.PI
+  const cos1 = latitude1 * pi / 180.0
+  const cos2 = latitude2 * pi / 180.0
+  const deltaLatitude = (latitude2 - latitude1) * pi / 180.0
+  const deltaLongitude = (longitude2 - longitude1) * pi / 180.0
+
+  const alpha = Math.sin(deltaLatitude / 2) * Math.sin(deltaLatitude / 2) + Math.cos(cos1) * Math.cos(cos2) * Math.sin(deltaLongitude / 2) * Math.sin(deltaLongitude / 2)
+  const constant = 2 * Math.atan2(Math.sqrt(alpha), Math.sqrt(1 - alpha))
+  return earthRadius * constant
+}
+
+const validateLatOrLong = value => {
+  if (typeof value !== 'number') {
+    throw new TypeError('The value of latitude or longitude should be a number')
+  }
+}
+
+
+
+
+
+
+
+
+const getNumOfDivisors = (num) => {
+    let numberOfDivisors = 0
+
+      const sqrtNum = Math.sqrt(num)
+  for (let i = 0; i <= sqrtNum; i++) {
+        if (num % i === 0) {
+      if (i === sqrtNum) {
+                numberOfDivisors++
+      } else {
+                numberOfDivisors += 2
+      }
+    }
+  }
+  return numberOfDivisors
+}
+
+
+const firstTriangularWith500Divisors = () => {
+  let triangularNum
+    for (let n = 1; ; n++) {
+        triangularNum = (1 / 2) * n * (n + 1)
+    if (getNumOfDivisors(triangularNum) >= 500) return triangularNum
+  }
+}
+
+
+const SQ5 = 5 ** 0.5 const PHI = (1 + SQ5) / 2 
+
+  const highestIndex = Math.floor(Math.log(limit * SQ5) / Math.log(PHI))
+  const n = Math.floor(highestIndex / 3)
+  return ((PHI ** (3 * n + 3) - 1) / (PHI ** 3 - 1) -
+    ((1 - PHI) ** (3 * n + 3) - 1) / ((1 - PHI) ** 3 - 1)) / SQ5
+}
+
+
+
+const powerDigitSum = function (n = 2, pow = 1000) {
+    
+  const digits = [n]
+  let p = 1
+
+  while (++p <= pow) {
+    let carry = 0
+    for (let exp = 0; exp < digits.length; exp++) {
+      const prod = digits[exp] * n + carry
+      carry = Math.floor(prod / 10)
+      digits[exp] = prod % 10
+    }
+    while (carry > 0) {
+      digits.push(carry % 10)
+      carry = Math.floor(carry / 10)
+    }
+  }
+
+  
+  return digits.reduce((prev, current) => prev + current, 0)
+}
+
+
+
+
+  let sumOfSquares = 0
+  let sums = 0
+  for (let i = 1; i <= num; i++) {
+    sumOfSquares += i ** 2     sums += i   }
+  return (sums ** 2) - sumOfSquares }
+
+
+
+
+function sumOfNonAbundantNumbers (n = 28123) {
+  const abundantNumbers = []   const sumOfAbundantNumbers = {}   let sum = 0
+
+  for (let i = 1; i <= n; i++) {
+    if (isAbundant(i)) {
+      abundantNumbers.push(i)       abundantNumbers.forEach(num => {         const sum = num + i
+        sumOfAbundantNumbers[sum] = true
+      })
+    }
+  }
+
+  for (let i = 1; i <= n; i++) {
+    if (!sumOfAbundantNumbers[i]) {       sum += i
+    }
+  }
+
+  return sum
+}
+
+
+
+function isAbundant (number) {
+  let sum = 0
+  for (let i = 1; i <= number / 2; i++) {
+    if (number % i === 0) {       sum += i     }
+  }
+  return sum > number
+}
+
+
+
+
+
+
+
+
+
+
+const grid1 = `73167176531330624919225119674426574742355349194934
+96983520312774506326239578318016984801869478851843
+85861560789112949495459501737958331952853208805511
+12540698747158523863050715693290963295227443043557
+66896648950445244523161731856403098711121722383113
+38991007832084782777189757278819047278899274961949
+30358907296290491560440772390713810515859307960866
+70172427121883998797908792274921901699720888093776
+65727333001053367881220235421809751254540594752243
+82834772897718748193457134085784719857638187485919
+53697817977846174064955149290862569321978468622482
+83972241375657056057490261407972968652414535100474
+82166370484403199890008895243450658541227588666881
+83247832478757285710958372981577583275832789327921
+17866458359124566529476545682848912883142607690042
+24219022671055626321111109370544217506941658960408
+84327878357761783787589375857378271083787811983779
+84580156166097919133875499200524063689912560717606
+05886116467109405077541002256983155200055935729725
+82347875831098357801578571807585817518287829189189`
+
+const grid2 = `73167176531330624919225119674426574742355349194934
+96983520312774506326239578318016984801869478851843
+85861560789112949495459501737958331952853208805511
+12540698747158523863050715693290963295227443043557
+66896648950445244523161731856403098711121722383113
+62229893423380308135336276614282806444486645238749
+30358907296290491560440772390713810515859307960866
+70172427121883998797908792274921901699720888093776
+65727333001053367881220235421809751254540594752243
+52584907711670556013604839586446706324415722155397
+53697817977846174064955149290862569321978468622482
+83972241375657056057490261407972968652414535100474
+82166370484403199890008895243450658541227588666881
+16427171479924442928230863465674813919123162824586
+17866458359124566529476545682848912883142607690042
+24219022671055626321111109370544217506941658960408
+07198403850962455444362981230987879927244284909188
+84580156166097919133875499200524063689912560717606
+05886116467109405077541002256983155200055935729725
+71636269561882670428252483600823257530420752963450`
+
+const grid3 = `89125732138957892357892768971807934878999818278898
+48327483578957875827583295789187588875238579887789
+74358275778171870973857835738758275210873583758279
+81347834738473878758758373857893758787772897580719
+81232847857895758758987587501087575387538183787098
+17047878395783578750837100983787587582797837508298
+42894789325732857893759187987487489748377578791989
+82147328972387832578327581919827382758932789798289
+83243289473847328974832947832748932472387895738978
+84738294738973289578753287582375238957573297892398
+29383748329748397483274832748327477575018978975289
+48327483758375846372864736476478364783647463278787
+73281473847832974328758975890189373857875875895898
+74328978748329789357389578329758329758937893758979
+81738957389579287598217589127589375893275987359889
+71890743894732897510875895783297591085738975837897
+10783974839479879857895789758975981735870175835789
+01494787857897583758975849758475107589754897589789
+09939858758919788017587897587387585775289757982898
+74718478978758758975897589789789798789178957789789`
+
+const grid4 = `99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999
+99999999999999999999999999999999999999999999999999`
+
+
+
+
+const example = `
+3
+7 4
+2 4 6
+8 5 9 3
+`
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  let newnumm = num
+  let largestFact = 0
+  let counter = 2
+  while (counter * counter <= newnumm) {
+    if (newnumm % counter === 0) {
+      newnumm = newnumm / counter
+    } else {
+      counter++
+    }
+  }
+  if (newnumm > largestFact) {
+    largestFact = newnumm
+  }
+  return largestFact
+}
+
+
+
+
+const triangle = `
+75
+95 64
+17 47 82
+18 35 87 10
+20 04 82 47 65
+19 01 23 75 03 34
+88 02 77 73 07 63 67
+99 65 04 28 06 16 70 92
+41 41 26 56 83 40 80 70 33
+41 48 72 33 47 32 37 16 94 29
+53 71 44 65 25 43 91 52 97 51 14
+70 11 33 28 77 73 17 78 39 68 17 57
+91 71 52 38 17 14 91 43 58 50 27 29 48
+63 66 04 68 89 53 67 30 73 16 69 87 40 31
+04 62 98 27 23 09 70 98 73 93 38 53 60 04 23
+`
+
+
+  /
+
+  grid = grid.split(/\r\n|\n/).filter(l => l).map(r => r.split(' ').map(n => +n))
+
+  for (let i = grid.length - 2; i >= 0; i--) {
+    for (let j = 0; j < grid[i].length; j++) {
+      grid[i][j] += Math.max(grid[i + 1][j], grid[i + 1][j + 1])
+    }
+  }
+
+  return grid[0][0]
+}
+
+const largestAdjacentNumber = (grid, consecutive) => {
+  grid = grid.split('\n').join('')
+  const splitedGrid = grid.split('\n')
+  let largestProd = 0
+
+  for (const row in splitedGrid) {
+    const currentRow = splitedGrid[row].split('').map(x => Number(x))
+
+    for (let i = 0; i < currentRow.length - consecutive; i++) {
+      const combine = currentRow.slice(i, i + consecutive)
+
+      if (!combine.includes(0)) {
+        const product = combine.reduce(function (a, b) {
+          return a * b
+        })
+
+        if (largestProd < product) largestProd = product
+      }
+    }
+  }
+  return largestProd
+}
+
+
+/
+
+const isPythagoreanTriplet = (a, b, c) => Math.pow(a, 2) + Math.pow(b, 2) === Math.pow(c, 2)
+
+
+  for (let a = 0; a < 1000; a++) {
+    for (let b = a + 1; b < 1000; b++) {
+      for (let c = b + 1; c < 1000; c++) {
+        if (isPythagoreanTriplet(a, b, c) && a + b + c === 1000) {
+          return a * b * c
+        }
+      }
+    }
+  }
+}
+/
+
+const getCollatzSequenceLength = (num, seqLength) => {
+  if (num === 1) {
+    return seqLength
+  } else {
+    let newElement
+    if (num % 2 === 0) {
+      newElement = num / 2
+    } else {
+      newElement = (3 * num) + 1
+    }
+    seqLength++
+    return getCollatzSequenceLength(newElement, seqLength)
+  }
+}
+
+
+  let startingPointForLargestSequence = 1
+  let largestSequenceLength = 1
+  for (let i = 2; i < limit; i++) {
+    const currentSequenceLength = getCollatzSequenceLength(i, 1)
+    if (currentSequenceLength > largestSequenceLength) {
+      startingPointForLargestSequence = i
+      largestSequenceLength = currentSequenceLength
+    }
+  }
+  return startingPointForLargestSequence
+}
+
+
+const factorialDigitSum = (n = 100) => {
+    const digits = [1]
+
+  for (let x = 2; x <= n; x++) {
+    let carry = 0
+    for (let exp = 0; exp < digits.length; exp++) {
+      const prod = digits[exp] * x + carry
+      carry = Math.floor(prod / 10)
+      digits[exp] = prod % 10
+    }
+    while (carry > 0) {
+      digits.push(carry % 10)
+      carry = Math.floor(carry / 10)
+    }
+  }
+
+  
+  return digits.reduce((prev, current) => prev + current, 0)
+}
+
+
+/
+
+  let i
+  let n
+  let m
+  let d
+  let limit
+  let number = 0
+
+  for (i = 1; i < digits; i++) {
+    number = 10 * number + 9
+  }
+  const inf = number   const sup = 10 * number + 9 
+  const isPalindromic = (n) => {
+    let p = 0
+    const q = n
+    let r
+    while (n > 0) {
+      r = n % 10
+      p = 10 * p + r
+      n = Math.floor(n / 10)
+    }
+    return p === q   }
+
+  for (n = sup * sup, m = inf * inf; n > m; n--) {
+    if (isPalindromic(n)) {
+      limit = Math.ceil(Math.sqrt(n))
+      d = sup
+      while (d >= limit) {
+        if (n % d === 0 && n / d > inf) {
+          return n
+        }
+        d -= 1
+      }
+    }
+  }
+  return NaN }
+
+const isPrime = (number) => {
+  if (number === 2) return true
+  if (number % 2 === 0) return false
+
+  for (let j = 3; j * j <= number; j += 2) {
+    if (number % j === 0) {
+      return false
+    }
+  }
+  return true
+}
+
+const calculateSumOfPrimeNumbers = (maxNumber) => {
+  let sum = 0
+  for (let i = maxNumber - 1; i >= 2; i--) {
+    if (isPrime(parseInt(i)) === true) {
+      sum += i
+    }
+  }
+  return sum
+}
+
+
+
+
+function fibonacciIndex (t = 1000) {
+  const digits = 10n ** BigInt(t - 1)
+  let fib0 = BigInt(0)
+  let fib1 = BigInt(1)
+  let index = 1
+  while (fib1 < digits) {     const tempfib = fib1
+    fib1 = fib1 + fib0
+    fib0 = tempfib
+    index += 1
+  }
+  return (index)
+}
+
+
+/
+
+const multiplesThreeAndFive = (num) => {
+  let total = 0
+    for (let i = 0; i < num; i++) {
+    if (i % 3 === 0 || i % 5 === 0) {
+      total += i
+    }
+  }
+  return total
+}
+
+
+/
+
+
+
+  let paths
+  for (let i = 1, paths = 1; i <= gridSize; i++) {
+    paths = paths * (gridSize + i) / i
+  }
+    return paths
+}
+
+/
+
+
+  const divisors = [20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2]
+  let num = 21
+  let result
+
+  while (!result) {
+    const isDivisibleByAll = divisors.every((divisor) => num % divisor === 0)
+    if (isDivisibleByAll) result = num
+    else num++
+  }
+
+  return result
+}
+
+
+function slidingWindow (arr, num) {
+      if (arr.length < num) return null
+    let maxSum = 0
+    let tempSum = 0
+    for (let i = 0; i < num; i++) {
+    maxSum += arr[i]
+  }
+    tempSum = maxSum
+    for (let i = num; i < arr.length; i++) {
+        tempSum = tempSum - arr[i - num] + arr[i]
+        maxSum = Math.max(maxSum, tempSum)
+  }
+  return maxSum
+}
+
+
+
+
+function binarySearch (arr, value, floor, ceiling) {
+    const mid = Math.floor((floor + ceiling) / 2)
+
+    if (arr[mid] === value) {
+    return mid
+  }
+
+  if (floor > ceiling) return -1
+
+      if (arr[mid] > value) {
+    return binarySearch(arr, value, floor, mid - 1)
+          } else {
+    return binarySearch(arr, value, mid + 1, ceiling)
+  }
+}
+
+function exponentialSearch (arr, length, value) {
+    if (arr[0] === value) {
+    return 0
+  }
+
+    let i = 1
+  while (i < length && arr[i] <= value) {
+    i = i * 2
+  }
+
+    return binarySearch(arr, value, i / 2, Math.min(i, length))
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const arr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+const stringArr = [
+  'Alpha',
+  'Bravo',
+  'Charlie',
+  'Delta',
+  'Echo',
+  'Foxtrot',
+  'Golf',
+  'Hotel',
+  'India',
+  'Juliet',
+  'Kilo',
+  'Lima',
+  'Mike',
+  'November',
+  'Oscar',
+  'Papa',
+  'Quebec',
+  'Romeo',
+  'Sierra',
+  'Tango',
+  'Uniform',
+  'Victor',
+  'Whiskey',
+  'X-Ray',
+  'Yankee',
+  'Zulu'
+]
+
+
+
+
+const uf = new UnionFind(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/
+
+  if (!array || array.length <= k) {
+    throw new Error('Invalid arguments')
+  }
+
+  let from = 0
+  let to = array.length - 1
+  while (from < to) {
+    let left = from
+    let right = to
+    const pivot = array[Math.ceil((left + right) * 0.5)]
+
+    while (left < right) {
+      if (array[left] >= pivot) {
+        const tmp = array[left]
+        array[left] = array[right]
+        array[right] = tmp
+        --right
+      } else {
+        ++left
+      }
+    }
+
+    if (array[left] > pivot) {
+      --left
+    }
+
+    if (k <= left) {
+      to = left
+    } else {
+      from = left + 1
+    }
+  }
+  return array
+}
+
+/
+
+/
+function SearchArray (searchNum, ar, output = v => console.log(v)) {
+  const position = Search(ar, searchNum)
+  if (position !== -1) {
+    output('The element was found at ' + (position + 1))
+  } else {
+    output('The element not found')
+  }
+}
+
+function Search (theArray, key) {
+  for (let n = 0; n < theArray.length; n++) {
+    if (theArray[n] === key) { return n }
+  }
+  return -1
+}
+
+
+
+/
+
+function makeTable (str) {
+      const table = new Array(str.length)
+  let maxPrefix = 0
+    table[0] = 0
+
+    for (let i = 1; i < str.length; i++) {
+        while (maxPrefix > 0 && str.charAt(i) !== str.charAt(maxPrefix)) {
+                  maxPrefix = table[maxPrefix - 1]
+    }
+        if (str.charAt(maxPrefix) === str.charAt(i)) {
+                                          maxPrefix++
+          }
+    table[i] = maxPrefix
+  }
+  return table
+}
+
+
+    const prefixes = makeTable(word)
+  const matches = []
+
+    let j = 0
+    let i = 0
+  while (i < str.length) {
+        if (str.charAt(i) === word.charAt(j)) {
+      i++
+      j++
+    }
+                                                if (j === word.length) {
+      matches.push(i - j)
+      j = prefixes[j - 1]
+                } else if (str.charAt(i) !== word.charAt(j)) {
+            if (j !== 0) {
+        j = prefixes[j - 1]
+      } else {
+                i++
+      }
+    }
+  }
+
+  return matches
+}
+
+/
+
+const jumpSearch = (arr, value) => {
+  const length = arr.length
+  let step = Math.floor(Math.sqrt(length))
+  let lowerBound = 0
+  while (arr[Math.min(step, length) - 1] < value) {
+    lowerBound = step
+    step += step
+    if (lowerBound >= length) {
+      return -1
+    }
+  }
+
+  const upperBound = Math.min(step, length)
+  while (arr[lowerBound] < value) {
+    lowerBound++
+    if (lowerBound === upperBound) {
+      return -1
+    }
+  }
+  if (arr[lowerBound] === value) {
+    return lowerBound
+  }
+  return -1
+}
+const arr = [0, 0, 4, 7, 10, 23, 34, 40, 55, 68, 77, 90]
+jumpSearch(arr, 4)
+jumpSearch(arr, 34)
+jumpSearch(arr, 77)
+
+function UnionFind (n, key) {
+  if (!(this instanceof UnionFind)) return new UnionFind(n)
+  if (key && typeof key !== 'function') {
+    throw new Error('key has to be a function or else left undefined')
+  }
+  let cnt, length
+      key = key || function (a) { return a }
+  cnt = length = n
+  const id = new Array(n)
+  const sz = new Array(n)
+  for (let i = 0; i < n; i++) {
+    id[i] = i
+    sz[i] = 1
+  }
+    this.size = function () {
+    return length
+  }
+    this.count = function () {
+    return cnt
+  }
+    this.find = function (p) {
+    p = key(p)
+    while (p !== id[p]) {
+      id[p] = id[id[p]]
+      p = id[p]
+    }
+    return p
+  }
+    this.connected = function (p, q) {
+    p = key(p)
+    q = key(q)
+    ensureIndexWithinBounds(p, q)
+    return this.find(p) === this.find(q)
+  }
+    this.union = function (p, q) {
+    p = key(p)
+    q = key(q)
+    ensureIndexWithinBounds(p, q)
+    const i = this.find(p)
+    const j = this.find(q)
+    if (i === j) return
+    if (sz[i] < sz[j]) {
+      id[i] = j; sz[j] += sz[i]
+    } else {
+      id[j] = i; sz[i] += sz[j]
+    }
+    cnt--
+  }
+  function ensureIndexWithinBounds (args) {
+    for (let i = arguments.length - 1; i >= 0; i--) {
+      const p = arguments[i]
+      if (p >= length) throw new Error('Index out of bounds. The maximum index can be length-1')
+    }
+  }
+}
+
+
+/
+
+function binarySearchRecursive (arr, x, low = 0, high = arr.length - 1) {
+  const mid = Math.floor(low + (high - low) / 2)
+
+  if (high >= low) {
+    if (arr[mid] === x) {
+            return mid
+    }
+
+    if (x < arr[mid]) {
+            return binarySearchRecursive(arr, x, low, mid - 1)
+    } else {
+            return binarySearchRecursive(arr, x, mid + 1, high)
+    }
+  } else {
+        return -1
+  }
+}
+function binarySearchIterative (arr, x, low = 0, high = arr.length - 1) {
+  while (high >= low) {
+    const mid = Math.floor(low + (high - low) / 2)
+
+    if (arr[mid] === x) {
+            return mid
+    }
+
+    if (x < arr[mid]) {
+            high = mid - 1
+    } else {
+            low = mid + 1
+    }
+  }
+    return -1
+}
+
+
+
+
+
+  const length = arr.length - 1
+  let low = 0
+  let high = length
+  let position = -1
+  let delta = -1
+
+    while (low <= high && key >= arr[low] && key <= arr[high]) {
+    delta = (key - arr[low]) / (arr[high] - arr[low])
+    position = low + Math.floor((high - low) * delta)
+
+        if (arr[position] === key) {
+      return position
+    }
+
+        if (arr[position] < key) {
+      low = position + 1
+          } else {
+      high = position - 1
+    }
+  }
+
+  return -1
+}
+
+
+/
+
+function ternarySearchRecursive (arr, key, low = 0, high = arr.length - 1) {
+  if (high >= low) {
+        const mid1 = Math.floor(low + (high - low) / 3)
+    const mid2 = Math.floor(high - (high - low) / 3)
+
+        if (arr[mid1] === key) {
+            return mid1
+    }
+    if (arr[mid2] === key) {
+            return mid2
+    }
+
+                    if (key < arr[mid1]) {
+            return ternarySearchRecursive(arr, key, low, mid1 - 1)
+    } else if (key > arr[mid2]) {
+            return ternarySearchRecursive(arr, key, mid2 + 1, high)
+    } else {
+            return ternarySearchRecursive(arr, key, mid1 + 1, mid2 - 1)
+    }
+  } else {
+        return -1
+  }
+}
+
+function ternarySearchIterative (arr, key, low = 0, high = arr.length - 1) {
+  while (high >= low) {
+        const mid1 = Math.floor(low + (high - low) / 3)
+    const mid2 = Math.floor(high - (high - low) / 3)
+
+        if (arr[mid1] === key) {
+            return mid1
+    }
+    if (arr[mid2] === key) {
+            return mid2
+    }
+
+                    if (key < arr[mid1]) {
+            high = mid1 - 1
+    } else if (key > arr[mid2]) {
+            low = mid2 + 1
+    } else {
+            low = mid1 + 1
+      high = mid2 - 1
+    }
+  }
+    return -1
+}
+
+
+
+
+
+  let fib2 = 0   let fib1 = 1   let fibK = fib2 + fib1 
+  /
+  while (fibK < n) {
+    fib2 = fib1
+    fib1 = fibK
+    fibK = fib2 + fib1
+  }
+    let offset = -1
+
+  /
+
+  while (fibK > 1) {
+        const i = Math.min(offset + fib2, n - 1)
+
+    /
+    if (arr[i] < x) {
+      fibK = fib1
+      fib1 = fib2
+      fib2 = fibK - fib1
+      offset = i
+      /
+    } else if (arr[i] > x) {
+      fibK = fib2
+      fib1 = fib1 - fib2
+      fib2 = fibK - fib1
+    } else {
+          return i
+    }
+  }
+
+    if (fib1 && arr[offset + 1] === x) {
+    return offset + 1
+  }
+    return -1
+}
+
+
+const fibonacci = (N) => {
+  if (!Number.isInteger(N)) {
+    throw new TypeError('Input should be integer')
+  }
+
+    let firstNumber = 0
+  let secondNumber = 1
+
+  for (let i = 1; i < N; i++) {
+    const sumOfNumbers = firstNumber + secondNumber
+        firstNumber = secondNumber
+    secondNumber = sumOfNumbers
+  }
+
+  return N ? secondNumber : firstNumber
+}
+
+
+/
+/
+function NumberOfSubsetSum (array, sum) {
+  const dp = []   for (let i = 1; i <= sum; i++) {
+    dp[i] = 0
+  }
+  dp[0] = 1 
+  for (let i = 0; i < array.length; i++) {
+    for (let j = sum; j >= array[i]; j--) {
+      if (j - array[i] >= 0) {
+        dp[j] += dp[j - array[i]]
+      }
+    }
+  }
+  return dp[sum]
+}
+
+
+
+
+/
+
+const minimumEditDistance = (word1, word2) => {
+  const n = word1.length
+  const m = word2.length
+  const dp = new Array(m + 1).fill(0).map(item => [])
+
+  /
+
+  for (let i = 0; i < n + 1; i++) {
+    dp[0][i] = i
+  }
+
+  for (let i = 0; i < m + 1; i++) {
+    dp[i][0] = i
+  }
+
+  /
+
+  for (let i = 1; i < m + 1; i++) {
+    for (let j = 1; j < n + 1; j++) {
+      const letter1 = word1[j - 1]
+      const letter2 = word2[i - 1]
+
+      if (letter1 === letter2) {
+        dp[i][j] = dp[i - 1][j - 1]
+      } else {
+        dp[i][j] = Math.min(dp[i - 1][j], dp[i - 1][j - 1], dp[i][j - 1]) + 1
+      }
+    }
+  }
+
+  return dp[m][n]
+}
+
+
+/
+function shuf (datasetSource, sampleSize) {
+  const output = fillBaseSample(datasetSource, sampleSize)
+
+  return randomizeOutputFromDataset(datasetSource, output)
+}
+
+
+function fillBaseSample (datasetSource, sampleSize) {
+  let filledIndexes = []
+  let output = new Array(sampleSize)
+
+    while (true) {
+    const iterator = datasetSource.next()
+    if (iterator.done) break
+
+    let insertTo = Math.floor(Math.random() * output.length)
+    while (filledIndexes.includes(insertTo)) {
+      insertTo++
+      if (insertTo === output.length) {
+        insertTo = 0
+      }
+    }
+    output[insertTo] = {
+      value: iterator.value
+    }
+
+    filledIndexes = [...filledIndexes, insertTo]
+
+    if (filledIndexes.length === sampleSize) {
+      break
+    }
+  }
+
+  if (filledIndexes.length < output.length) {
+        output = output.filter((_, i) => filledIndexes.includes(i))
+  }
+
+  return output.map((o) => o.value)
+}
+
+
+function randomizeOutputFromDataset (datasetSource, output) {
+  const newOutput = [...output]
+  let readSoFar = output.length
+
+  while (true) {
+    const iterator = datasetSource.next()
+    if (iterator.done) break
+    readSoFar++
+
+    const insertTo = Math.floor(Math.random() * readSoFar)
+    if (insertTo < newOutput.length) {
+      newOutput[insertTo] = iterator.value
+    }
+  }
+
+  return newOutput
+}
+
+
+
+function * generateRandomData (length) {
+  const maxValue = Math.pow(2, 31) - 1
+  for (let i = 0; i < length; i++) {
+    yield Math.floor(Math.random() * maxValue)
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+  if (s1.length > s2.length) return false
+  let start = 0
+  let end = s1.length - 1
+  const s1Set = SetHash()
+  const s2Set = SetHash()
+  for (let i = 0; i < s1.length; i++) {
+    s1Set[s1[i]]++
+    s2Set[s2[i]]++
+  }
+  if (equals(s1Set, s2Set)) return true
+  while (end < s2.length - 1) {
+    if (equals(s1Set, s2Set)) return true
+    end++
+    const c1 = s2[start]
+    const c2 = s2[end]
+    if (s2Set[c1] > 0) s2Set[c1]--
+    s2Set[c2]++
+    start++
+    if (equals(s1Set, s2Set)) return true
+  }
+  return false
+}
+function equals (a, b) {
+  return JSON.stringify(a) === JSON.stringify(b)
+}
+
+function SetHash () {
+  const set = new Set()
+  const alphabets = 'abcdefghijklmnopqrstuvwxyz'
+  for (let i = 0; i < alphabets.length; i++) {
+    set[alphabets[i]] = 0
+  }
+  return set
+}
+
+
+
+
+
+
+  let maxLength = 0
+  let start = 0
+  let end = 0
+  const map = {}
+  while (end < s.length) {
+    if (map[s[end]] === undefined) {
+      map[s[end]] = 1
+      maxLength = Math.max(maxLength, end - start + 1)
+      end++
+    } else {
+      while (s[start] !== s[end]) {
+        delete map[s[start]]
+        start++
+      }
+      delete map[s[start]]
+      start++
+    }
+  }
+  return maxLength
+}
+
+
+
+
+
+const zeroOneKnapsack = (arr, n, cap, cache) => {
+  if (cap === 0 || n === 0) {
+    cache[n][cap] = 0
+    return cache[n][cap]
+  }
+  if (cache[n][cap] !== -1) {
+    return cache[n][cap]
+  }
+  if (arr[n - 1][0] <= cap) {
+    cache[n][cap] = Math.max(arr[n - 1][1] + zeroOneKnapsack(arr, n - 1, cap - arr[n - 1][0], cache), zeroOneKnapsack(arr, n - 1, cap, cache))
+    return cache[n][cap]
+  } else {
+    cache[n][cap] = zeroOneKnapsack(arr, n - 1, cap, cache)
+    return cache[n][cap]
+  }
+}
+
+const example = () => {
+  /
+  let input = `1
+    4 5
+    1 8
+    2 4
+    3 0
+    2 5
+    2 3`
+
+  input = input.trim().split('\n')
+  input.shift()
+  const length = input.length
+
+  const output = []
+
+  let i = 0
+  while (i < length) {
+    const cap = Number(input[i].trim().split(' ')[0])
+    const currlen = Number(input[i].trim().split(' ')[1])
+    let j = i + 1
+    const arr = []
+    while (j <= i + currlen) {
+      arr.push(input[j])
+      j++
+    }
+    const newArr = arr.map(e =>
+      e.trim().split(' ').map(Number)
+    )
+    const cache = []
+    for (let i = 0; i <= currlen; i++) {
+      const temp = []
+      for (let j = 0; j <= cap; j++) {
+        temp.push(-1)
+      }
+      cache.push(temp)
+    }
+    const result = zeroOneKnapsack(newArr, currlen, cap, cache)
+    output.push(result)
+    i += currlen + 1
+  }
+
+  return output
+}
+
+
+
+const isValid = (board, row, col, k) => {
+  for (let i = 0; i < 9; i++) {
+    const m = 3 * Math.floor(row / 3) + Math.floor(i / 3)
+    const n = 3 * Math.floor(col / 3) + i % 3
+    if (board[row][i] === k || board[i][col] === k || board[m][n] === k) {
+      return false
+    }
+  }
+  return true
+}
+
+const sudokuSolver = (data) => {
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (data[i][j] === '.') {
+        for (let k = 1; k <= 9; k++) {
+          if (isValid(data, i, j, `${k}`)) {
+            data[i][j] = `${k}`
+            if (sudokuSolver(data)) {
+              return true
+            } else {
+              data[i][j] = '.'
+            }
+          }
+        }
+        return false
+      }
+    }
+  }
+  return true
+}
+
+
+
+
+
+const tribonacci = (n) => {
+    const dp = new Array(n + 1)
+  dp[0] = 0
+  dp[1] = 1
+  dp[2] = 1
+  for (let i = 3; i <= n; i++) {
+    dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3]
+  }
+  return dp[n]
+}
+
+
+
+
+const climbStairs = (n) => {
+  let prev = 0
+  let cur = 1
+  let temp
+
+  for (let i = 0; i < n; i++) {
+    temp = prev
+    prev = cur
+    cur += temp
+  }
+  return cur
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/
+
+
+  const maxes = new Array(heights.length).fill(0)
+
+  let leftMax = 0
+  for (let i = 0; i < heights.length; i++) {
+    const height = heights[i]
+    maxes[i] = leftMax
+    leftMax = Math.max(leftMax, height)
+  }
+
+  let rightMax = 0
+  for (let i = heights.length - 1; i >= 0; i -= 1) {
+    const height = heights[i]
+    const minHeight = Math.min(rightMax, maxes[i])
+
+    if (height < minHeight) {
+      maxes[i] = minHeight - height
+    } else {
+      maxes[i] = 0
+    }
+    rightMax = Math.max(rightMax, height)
+  }
+  return maxes.reduce((a, b) => a + b, 0)
+}
+/
+
+
+function longestCommonSubsequence (str1, str2) {
+  const memo = new Array(str1.length + 1).fill(null)
+    .map(() => new Array(str2.length + 1).fill(null))
+
+  function recursive (end1, end2) {
+    if (end1 === -1 || end2 === -1) {
+      return 0
+    }
+
+    if (memo[end1][end2] !== null) {
+      return memo[end1][end2]
+    }
+
+    if (str1[end1] === str2[end2]) {
+      memo[end1][end2] = 1 + recursive(end1 - 1, end2 - 1)
+      return memo[end1][end2]
+    } else {
+      memo[end1][end2] = Math.max(
+        recursive(end1 - 1, end2),
+        recursive(end1, end2 - 1)
+      )
+      return memo[end1][end2]
+    }
+  }
+
+  return recursive(str1.length - 1, str2.length - 1)
+}
+
+
+
+
+    const n = arrayItems.length
+  if (n < 3) throw new Error('Triplet cannot exist with the given array')
+  let max1 = arrayItems[0]
+  let max2 = -1
+  let max3 = -1
+  let min1 = arrayItems[0]
+  let min2 = -1
+  for (let i = 1; i < n; i++) {
+    if (arrayItems[i] > max1) {
+      max3 = max2
+      max2 = max1
+      max1 = arrayItems[i]
+    } else if (max2 === -1 || arrayItems[i] > max2) {
+      max3 = max2
+      max2 = arrayItems[i]
+    } else if (max3 === -1 || arrayItems[i] > max3) {
+      max3 = arrayItems[i]
+    }
+    if (arrayItems[i] < min1) {
+      min2 = min1
+      min1 = arrayItems[i]
+    } else if (min2 === -1 || arrayItems[i] < min2) {
+      min2 = arrayItems[i]
+    }
+  }
+  const prod1 = max1 * max2 * max3
+  const prod2 = max1 * min1 * min2
+  return Math.max(prod1, prod2)
+}
+
+function sieveOfEratosthenes (n) {
+  if (n <= 1) return []
+  const primes = new Array(n + 1).fill(true)   primes[0] = primes[1] = false   for (let i = 2; i * i <= n; i++) {
+    if (primes[i]) {
+      for (let j = i * i; j <= n; j += i) {
+        primes[j] = false
+      }
+    }
+  }
+
+  return primes.reduce((result, isPrime, index) => {
+    if (isPrime) {
+      result.push(index)
+    }
+    return result
+  }, [])
+}
+
+
+
+
+/
+
+
+  const n = s.length
+
+  const dp = new Array(n).fill(0).map(item => new Array(n).fill(0).map(item => 0))
+
+    for (let i = 0; i < n; i++) {
+    dp[i][i] = 1
+  }
+
+  for (let i = 1; i < n; i++) {
+    for (let j = 0; j < n - i; j++) {
+      const col = j + i
+      if (s[j] === s[col]) {
+        dp[j][col] = 2 + dp[j + 1][col - 1]
+      } else {
+        dp[j][col] = Math.max(dp[j][col - 1], dp[j + 1][col])
+      }
+    }
+  }
+
+  return dp[0][n - 1]
+}
+
+const minCostPath = (matrix) => {
+  /
+
+  const n = matrix.length
+  const m = matrix[0].length
+
+    const moves = new Array(n)
+  for (let i = 0; i < moves.length; i++) moves[i] = new Array(m)
+
+    moves[0][0] = matrix[0][0]   for (let i = 1; i < m; i++) moves[0][i] = moves[0][i - 1] + matrix[0][i]
+  for (let i = 1; i < n; i++) moves[i][0] = moves[i - 1][0] + matrix[i][0]
+
+  for (let i = 1; i < n; i++) {
+    for (let j = 1; j < m; j++) { moves[i][j] = Math.min(moves[i - 1][j], moves[i][j - 1]) + matrix[i][j] }
+  }
+
+  return moves[n - 1][m - 1]
+}
+
+
+
+
+
+/
+
+
+  let cummulativeSum = 0
+  let maxSum = Number.NEGATIVE_INFINITY   for (let i = 0; i < array.length; i++) {
+    cummulativeSum = cummulativeSum + array[i]
+    if (maxSum < cummulativeSum) {
+      maxSum = cummulativeSum
+    } else if (cummulativeSum < 0) {
+      cummulativeSum = 0
+    }
+  }
+  return maxSum
+  }
+function maximumNonAdjacentSum (nums) {
+  /
+
+  if (nums.length < 0) return 0
+
+  let maxIncluding = nums[0]
+  let maxExcluding = 0
+
+  for (const num of nums.slice(1)) {
+    const temp = maxIncluding
+    maxIncluding = maxExcluding + num
+    maxExcluding = Math.max(temp, maxExcluding)
+  }
+
+  return Math.max(maxExcluding, maxIncluding)
+}
+
+
+
+
+
+
+function minimum (a, b, c) {
+  if (a < b && a < c) {
+    return a
+  } else if (b < a && b < c) {
+    return b
+  } else {
+    return c
+  }
+}
+
+function costOfSubstitution (x, y) {
+  return x === y ? 0 : 1
+}
+
+function calculate (x, y) {
+  const dp = new Array(x.length + 1)
+  for (let i = 0; i < x.length + 1; i++) {
+    dp[i] = new Array(y.length + 1)
+  }
+
+  for (let i = 0; i < x.length + 1; i++) {
+    for (let j = 0; j < y.length + 1; j++) {
+      if (i === 0) {
+        dp[i][j] = j
+      } else if (j === 0) {
+        dp[i][j] = i
+      } else {
+        dp[i][j] = minimum(dp[i - 1][j - 1] + costOfSubstitution(x.charAt(i - 1), y.charAt(j - 1)), dp[i - 1][j] + 1, dp[i][j - 1] + 1)
+      }
+    }
+  }
+
+  return dp[x.length][y.length]
+}
+
+
+
+
+function longestIncreasingSubsequence (x) {
+  const length = x.length
+  const dp = Array(length).fill(1)
+
+  let res = 1
+
+  for (let i = 0; i < length; i++) {
+    for (let j = 0; j < i; j++) {
+      if (x[i] > x[j]) {
+        dp[i] = Math.max(dp[i], 1 + dp[j])
+        if (dp[i] > res) {
+          res = dp[i]
+        }
+      }
+    }
+  }
+
+  return res
+}
+
+
+/
+
+
+  const memo = new Array(n + 1)
+  memo[0] = 0
+
+  for (let i = 1; i <= n; i++) {
+    let maxVal = Number.MIN_VALUE
+    for (let j = 0; j < i; j++) { maxVal = Math.max(maxVal, prices[j] + memo[i - j - 1]) }
+    memo[i] = maxVal
+  }
+
+  return memo[n]
+}
+/
+
+
+  const n = s.length
+  const stack = []
+
+    const res = new Array(n).fill(-Infinity)
+
+  for (let i = 0; i < n; i++) {
+    const bracket = s[i]
+
+    if (bracket === ')' && s[stack[stack.length - 1]] === '(') {
+      res[i] = 1
+      res[stack[stack.length - 1]] = 1
+      stack.pop()
+    } else {
+      stack.push(i)
+    }
+  }
+
+    for (let i = 1; i < n; i++) {
+    res[i] = Math.max(res[i], res[i] + res[i - 1])
+  }
+
+    res.push(0)
+  return Math.max(...res)
+}
+
+
+    const combinations = new Array(amount + 1).fill(0)
+  combinations[0] = 1
+    for (let i = 0; i < coins.length; i++) {
+        for (let j = coins[i]; j < combinations.length; j++) {
+      combinations[j] += combinations[j - coins[i]]
+    }
+  }
+  return combinations[amount]
+}
+
+
+  const map = { 0: 1 }
+  for (let i = 1; i <= amount; i++) {
+    let min = Infinity
+    for (const coin of coins) {
+      if (i < coin) continue
+      min = Math.min(min, 1 + map[i - coin])
+    }
+    map[i] = min
+  }
+  return map[amount] === Infinity ? -1 : map[amount] - 1
+}
+/
+
+class Month {
+  constructor () {
+    this.Days = ['M', 'T', 'W', 'Th', 'F', 'S', 'Su']
+    this.BDays = ['M', 'Su', 'S', 'F', 'Th', 'W', 'T']
+    this.epoch = { month: 1, year: 1900 }
+    this.monthDays = [31, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    this.monthDaysLeap = [31, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+  }
+
+  printCal (days, startDay, output = value => console.log(value)) {
+    output('M   T   W   Th  F   S   Su')
+    const dates = []; let i
+    for (i = 1; i <= days; i++) {
+      dates.push(i)
+    }
+    for (i = 0; i < this.Days.indexOf(startDay); i++) {
+      dates.unshift(' ')
+    }
+    while (true) {
+      let row = ''
+      for (i = 0; (i < 7) && (dates.length !== 0); i++) {
+        row += dates.shift()
+        while ((row.length % 4) !== 0) {
+          row += ' '
+        }
+      }
+      output(row)
+      if (dates.length === 0) break
+    }
+  }
+
+  parseDate (date) {
+    const dateAr = []; let block = ''; let i
+    for (i = 0; i < date.length; i++) {
+      if (date[i] === '/') {
+        dateAr.push(parseInt(block))
+        block = ''
+        continue
+      }
+      block += date[i]
+    }
+    dateAr.push(parseInt(block))
+    if (dateAr.length !== 2) throw new Error('Improper string encoding')
+    const dateOb = { month: dateAr[0], year: dateAr[1] }
+    return dateOb
+  }
+
+  isLeapYear (year) {
+    if (((year % 400) === 0) || (((year % 100) !== 0) && ((year % 4) === 0))) return true
+    return false
+  }
+
+  isGreater (startDate, endDate) {
+    if (startDate.year > endDate.year) {
+      return true
+    } else if (startDate.year < endDate.year) {
+      return false
+    } else if (startDate.month > endDate.month) {
+      return true
+    } else if (startDate.month < endDate.month) {
+      return false
+    }
+    return true
+  }
+
+  getDayDiff (startDate, endDate) {
+    if (this.isGreater(startDate, endDate) === null) {
+      return 0
+    } else if ((this.isGreater(startDate, endDate) === true)) {
+      const midDate = startDate
+      startDate = endDate
+      endDate = midDate
+    }
+    let diff = 0
+    while (startDate.year !== endDate.year) {
+      diff += (this.isLeapYear(startDate.year)) ? 366 : 365
+      startDate.year = startDate.year + 1
+    }
+    while (startDate.month !== endDate.month) {
+      if (startDate.month < endDate.month) {
+        if (this.isLeapYear(startDate.year)) diff += this.monthDaysLeap[startDate.month]
+        else diff += this.monthDays[startDate.month]
+        startDate.month = startDate.month + 1
+      } else {
+        if (this.isLeapYear(startDate.year)) diff -= this.monthDaysLeap[startDate.month - 1]
+        else diff -= this.monthDays[startDate.month - 1]
+        startDate.month = startDate.month - 1
+      }
+    }
+    return diff
+  }
+
+  generateMonthCal (date) {
+    const Month = this.parseDate(date); let day = ''
+    let difference = this.getDayDiff(this.epoch, Month)
+    difference = difference % 7
+    let Month2 = this.parseDate(date)
+    day = (this.isGreater(Month2, this.epoch)) ? this.Days[difference] : this.BDays[difference]
+    Month2 = this.parseDate(date)
+    if (this.isLeapYear(Month2.year)) this.printCal(this.monthDaysLeap[Month2.month], day)
+    else this.printCal(this.monthDays[Month2.month], day)
+  }
+}
+
+
+
+
+const XORCipher = (str, key) => {
+  if (typeof str !== 'string' || !Number.isInteger(key)) {
+    throw new TypeError('Arguments type are invalid')
+  }
+
+  return str.replace(
+    /./g, (char) => String.fromCharCode(char.charCodeAt() ^ key)
+  )
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const caesarsCipher = (str, rotation) => {
+  if (typeof str !== 'string' || !Number.isInteger(rotation) || rotation < 0) {
+    throw new TypeError('Arguments are invalid')
+  }
+
+  const alphabets = new Array(26)
+    .fill()
+    .map((_, index) => String.fromCharCode(97 + index)) 
+  const cipherMap = alphabets.reduce(
+    (map, char, index) => map.set(char, alphabets[(rotation + index) % 26]),
+    new Map()
+  )
+
+  return str.replace(/[a-z]/gi, (char) => {
+    if (/[A-Z]/.) {
+      return cipherMap.get(char.toLowerCase()).toUpperCase()
+    }
+
+    return cipherMap.get(char)
+  })
+}
+
+
+
+function ROT13 (str) {
+  if (typeof str !== 'string') {
+    throw new TypeError('Argument should be string')
+  }
+
+  return str.replace(/[a-z]/gi, (char) => {
+    const charCode = char.charCodeAt()
+
+    if (/[n-z]/i.) {
+      return String.fromCharCode(charCode - 13)
+    }
+
+    return String.fromCharCode(charCode + 13)
+  })
+}
+
+
+
+function isLetter (str) {
+  return str.length === 1 && str.match(/[a-zA-Z]/i)
+}
+
+
+function isUpperCase (character) {
+  if (character === character.toUpperCase()) {
+    return true
+  }
+  if (character === character.toLowerCase()) {
+    return false
+  }
+}
+
+
+function encrypt (message, key) {
+  let result = ''
+
+  for (let i = 0, j = 0; i < message.length; i++) {
+    const c = message.charAt(i)
+    if (isLetter(c)) {
+      if (isUpperCase(c)) {
+        result += String.fromCharCode((c.charCodeAt(0) + key.toUpperCase().charCodeAt(j) - 2 * 65) % 26 + 65)       } else {
+        result += String.fromCharCode((c.charCodeAt(0) + key.toLowerCase().charCodeAt(j) - 2 * 97) % 26 + 97)       }
+    } else {
+      result += c
+    }
+    j = ++j % key.length
+  }
+  return result
+}
+
+
+function decrypt (message, key) {
+  let result = ''
+
+  for (let i = 0, j = 0; i < message.length; i++) {
+    const c = message.charAt(i)
+    if (isLetter(c)) {
+      if (isUpperCase(c)) {
+        result += String.fromCharCode(90 - (25 - (c.charCodeAt(0) - key.toUpperCase().charCodeAt(j))) % 26)
+      } else {
+        result += String.fromCharCode(122 - (25 - (c.charCodeAt(0) - key.toLowerCase().charCodeAt(j))) % 26)
+      }
+    } else {
+      result += c
+    }
+    j = ++j % key.length
+  }
+  return result
+}
+
+
+
+
+
+
+const alphabet = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+
+function checkKeywordValidity (keyword) {
+  keyword.split('').forEach((char, index) => {
+    const rest = keyword.slice(0, index) + keyword.slice(index + 1)
+    if (rest.indexOf(char) !== -1) {
+      return false
+    }
+  })
+  return true
+}
+
+function getEncryptedAlphabet (keyword) {
+  const encryptedAlphabet = keyword.split('')
+  alphabet.forEach((char) => {
+    if (encryptedAlphabet.indexOf(char) === -1) {
+      encryptedAlphabet.push(char)
+    }
+  })
+  return encryptedAlphabet
+}
+
+function translate (sourceAlphabet, targetAlphabet, message) {
+  return message.split('').reduce((encryptedMessage, char) => {
+    const isUpperCase = char === char.toUpperCase()
+    const encryptedCharIndex = sourceAlphabet.indexOf(char.toLowerCase())
+    const encryptedChar = encryptedCharIndex !== -1 ? targetAlphabet[encryptedCharIndex] : char
+    encryptedMessage += isUpperCase ? encryptedChar.toUpperCase() : encryptedChar
+    return encryptedMessage
+  }, '')
+}
+
+function checkInputs (keyword, message) {
+  if (!keyword || !message) {
+    throw new Error('Both keyword and message must be specified')
+  }
+
+  if (!checkKeywordValidity(keyword)) {
+    throw new Error('Invalid keyword!')
+  }
+}
+
+function encrypt (keyword, message) {
+  checkInputs(keyword, message)
+  return translate(alphabet, getEncryptedAlphabet(keyword.toLowerCase()), message)
+}
+
+function decrypt (keyword, message) {
+  checkInputs(keyword, message)
+  return translate(getEncryptedAlphabet(keyword.toLowerCase()), alphabet, message)
+}
+
+
+
+
+const Atbash = (str) => {
+  if (typeof str !== 'string') {
+    throw new TypeError('Argument should be string')
+  }
+
+  return str.replace(/[a-z]/gi, (char) => {
+    const charCode = char.charCodeAt()
+
+    if (/[A-Z]/.) {
+      return String.fromCharCode(90 + 65 - charCode)
+    }
+
+    return String.fromCharCode(122 + 97 - charCode)
+  })
+}
+
+
+
+function keyFinder (str) {   const wordBank = [
+    'I ',
+    'You ',
+    'We ',
+    'They ',
+    'He ',
+    'She ',
+    'It ',
+    ' the ',
+    'The ',
+    ' of ',
+    ' is ',
+    'Is ',
+    ' am ',
+    'Am ',
+    ' are ',
+    'Are ',
+    ' have ',
+    'Have ',
+    ' has ',
+    'Has ',
+    ' may ',
+    'May ',
+    ' be ',
+    'Be ']
+      const inStr = str.toString()   let outStr = ''   let outStrElement = ''   for (let k = 0; k < 26; k++) {     outStr = caesarCipherEncodeAndDecodeEngine(inStr, k) 
+        for (let s = 0; s < outStr.length; s++) {
+      for (let i = 0; i < wordBank.length; i++) {
+                        for (let w = 0; w < wordBank[i].length; w++) {
+          outStrElement += outStr[s + w]
+        }
+                        if (wordBank[i] === outStrElement) {
+          return k         }
+        outStrElement = ''       }     }
+  }
+  return 0 }
+
+/
+function caesarCipherEncodeAndDecodeEngine (inStr, numShifted) {
+  const shiftNum = numShifted
+  let charCode = 0
+  let outStr = ''
+  let shiftedCharCode = 0
+  let result = 0
+
+  for (let i = 0; i < inStr.length; i++) {
+    charCode = inStr[i].charCodeAt()
+    shiftedCharCode = charCode + shiftNum
+    result = charCode
+
+    if ((charCode >= 48 && charCode <= 57)) {
+      if (shiftedCharCode < 48) {
+        let diff = Math.abs(48 - 1 - shiftedCharCode) % 10
+
+        while (diff >= 10) {
+          diff = diff % 10
+        }
+        document.getElementById('diffID').innerHTML = diff
+
+        shiftedCharCode = 57 - diff
+
+        result = shiftedCharCode
+      } else if (shiftedCharCode >= 48 && shiftedCharCode <= 57) {
+        result = shiftedCharCode
+      } else if (shiftedCharCode > 57) {
+        let diff = Math.abs(57 + 1 - shiftedCharCode) % 10
+
+        while (diff >= 10) {
+          diff = diff % 10
+        }
+        document.getElementById('diffID').innerHTML = diff
+
+        shiftedCharCode = 48 + diff
+
+        result = shiftedCharCode
+      }
+    } else if ((charCode >= 65 && charCode <= 90)) {
+      if (shiftedCharCode <= 64) {
+        let diff = Math.abs(65 - 1 - shiftedCharCode) % 26
+
+        while ((diff % 26) >= 26) {
+          diff = diff % 26
+        }
+        shiftedCharCode = 90 - diff
+        result = shiftedCharCode
+      } else if (shiftedCharCode >= 65 && shiftedCharCode <= 90) {
+        result = shiftedCharCode
+      } else if (shiftedCharCode > 90) {
+        let diff = Math.abs(shiftedCharCode - 1 - 90) % 26
+
+        while ((diff % 26) >= 26) {
+          diff = diff % 26
+        }
+        shiftedCharCode = 65 + diff
+        result = shiftedCharCode
+      }
+    } else if ((charCode >= 97 && charCode <= 122)) {
+      if (shiftedCharCode <= 96) {
+        let diff = Math.abs(97 - 1 - shiftedCharCode) % 26
+
+        while ((diff % 26) >= 26) {
+          diff = diff % 26
+        }
+        shiftedCharCode = 122 - diff
+        result = shiftedCharCode
+      } else if (shiftedCharCode >= 97 && shiftedCharCode <= 122) {
+        result = shiftedCharCode
+      } else if (shiftedCharCode > 122) {
+        let diff = Math.abs(shiftedCharCode - 1 - 122) % 26
+
+        while ((diff % 26) >= 26) {
+          diff = diff % 26
+        }
+        shiftedCharCode = 97 + diff
+        result = shiftedCharCode
+      }
+    }
+    outStr = outStr + String.fromCharCode(parseInt(result))
+  }
+  return outStr
+}
+
+class IntervalTimer {
+  /
+  constructor (interval = 10,
+    callBack = () => {}) {
+    this.prevInterval = 0
+    if (this.instance == null) {
+      this.interval = interval
+      this.callBack = callBack
+      this.instance = this
+    } else {
+      return this.instance
+    }
+  }
+
+  /
+  startTimer () {
+    this.timer = setInterval(this.callBack, this.interval)
+  }
+
+  /
+  resetTimer () {
+    clearInterval(this.timer)
+    this.callBack = () => {}
+    return this.getElapsedTime()
+  }
+
+  /
+  getElapsedTime (offset = 0) {
+    this.timeElapsed = this.timer - this.prevInterval
+    this.prevInterval = this.timer
+    return this.timeElapsed - offset
+  }
+
+  /
+  getRunTime () {
+    return this.timer
+  }
+}
+
+
+const ExampleIntervalTimer = function (output = v => console.log(v)) {
+  /
+  const timer = new IntervalTimer()
+  timer.startTimer()
+
+    
+  /
+  const initOffset = timer.getRunTime()
+
+      output(timer.getElapsedTime(initOffset))
+
+  /
+  output(timer.resetTimer())
+}
+
+
+
+
+const getMonthDays = (monthNumber, year) => {
+  const the31DaysMonths = [1, 3, 5, 7, 8, 10, 12]
+  const the30DaysMonths = [4, 6, 9, 11]
+
+  if (!the31DaysMonths.includes(monthNumber) && !the30DaysMonths.includes(monthNumber) &&
+    (monthNumber !== 2)
+  ) {
+    throw new TypeError('Invalid Month Number.')
+  }
+
+  if (the31DaysMonths.includes(monthNumber)) { return 31 }
+
+  if (the30DaysMonths.includes(monthNumber)) { return 30 }
+
+    if (year % 4 === 0) {
+    if ((year % 100 !== 0) || (year % 100 === 0 && year % 400 === 0)) {
+      return 29
+    }
+  }
+
+  return 28
+}
+
+
+
+
+function integralEvaluation (N, a, b, func) {
+    if (!Number.isInteger(N) || Number.isNaN(a) || Number.isNaN(b)) { throw new TypeError('Expected integer N and finite a, b') }
+  if (N <= 0) { throw Error('N has to be >= 2') }   if (a > b) { throw Error('a must be less or equal than b') }   if (a === b) return 0 
+    const h = (b - a) / N
+
+    let xi = a   const pointsArray = []
+
+    let temp
+  for (let i = 0; i < N; i++) {
+    temp = func(xi + h / 2)
+    pointsArray.push(temp)
+    xi += h
+  }
+
+    let result = h
+  temp = 0
+  for (let i = 0; i < pointsArray.length; i++) temp += pointsArray[i]
+
+  result *= temp
+
+  if (Number.isNaN(result)) { throw Error('Result is NaN. The input interval does not belong to the functions domain') }
+
+  return result
+}
+
+
+
+
+const perfectCube = (num) => Math.round(num ** (1 / 3)) ** 3 === num
+
+
+/
+
+function sqrt (num, precision = 4) {
+  if (!Number.isFinite(num)) { throw new TypeError(`Expected a number, received ${typeof num}`) }
+  if (!Number.isFinite(precision)) { throw new TypeError(`Expected a number, received ${typeof precision}`) }
+  let sqrt = 1
+  for (let i = 0; i < precision; i++) {
+    sqrt -= (sqrt * sqrt - num) / (2 * sqrt)
+  }
+  return sqrt
+}
+
+
+/
+
+
+      if (n === 0) {
+    return 1
+  } else if (n % 2 === 1) {
+    return binaryExponentiation(a, n - 1) * a
+  } else {
+    const b = binaryExponentiation(a, n / 2)
+    return b * b
+  }
+}
+/
+
+function fareyApproximation (decimal, repeat = 20) {
+  let a = 0; let b = 1; let c = 1; let d = 1; let numerator; let denominator
+
+  for (let i = 0; i < repeat; i++) {
+    numerator = a + c
+    denominator = b + d
+
+    if (decimal > numerator / denominator) {
+      [a, b] = [numerator, denominator]
+    } else {
+      [c, d] = [numerator, denominator]
+    }
+  }
+
+  return { numerator, denominator }
+}
+
+
+
+
+  if (year % 400 === 0) return true
+  if (year % 100 === 0) return false
+  if (year % 4 === 0) return true
+
+  return false
+}
+/
+
+const factorial = (n) => {
+  let fact = 1
+  while (n !== 0) {
+    fact = fact * n
+    n--
+  }
+  return fact
+}
+
+
+const CheckKishnamurthyNumber = (number) => {
+    if (typeof number !== 'number') {
+    return new TypeError('Argument is not a number.')
+  }
+    let sumOfAllDigitFactorial = 0
+    let newNumber = number
+    while (newNumber > 0) {
+    const lastDigit = newNumber % 10
+        sumOfAllDigitFactorial += factorial(lastDigit)
+    newNumber = Math.floor(newNumber / 10)
+  }
+    return sumOfAllDigitFactorial === number
+}
+
+
+
+
+const FindMinIterator = (_iterable, _selector = undefined) => {
+  let min
+
+  const iterator = _iterable[Symbol.iterator]()
+  if (!_selector) {
+    let current = iterator.next()
+    if (current.done) { return undefined }
+    min = current.value
+
+    current = iterator.next()
+    while (!current.done) {
+      const x = current.value
+      if (x < min) { min = x }
+      current = iterator.next()
+    }
+  } else {
+    let current = iterator.next()
+    if (current.done) { return undefined }
+    min = _selector(current.value)
+
+    current = iterator.next()
+    while (!current.done) {
+      const x = _selector(current.value)
+      if (x < min) { min = x }
+      current = iterator.next()
+    }
+  }
+  return min
+}
+
+
+/
+
+const Identity = (n) => {
+        const res = []
+  for (let i = 0; i < n; i++) {
+    res[i] = []
+    for (let j = 0; j < n; j++) {
+      res[i][j] = i === j ? 1 : 0
+    }
+  }
+  return res
+}
+
+const MatMult = (matrixA, matrixB) => {
+          const n = matrixA.length
+  const matrixC = []
+  for (let i = 0; i < n; i++) {
+    matrixC[i] = []
+    for (let j = 0; j < n; j++) {
+      matrixC[i][j] = 0
+    }
+  }
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      for (let k = 0; k < n; k++) {
+        matrixC[i][j] += matrixA[i][k] * matrixB[k][j]
+      }
+    }
+  }
+  return matrixC
+}
+
+
+        if (m === 0) {
+        return Identity(mat.length)
+  } else if (m % 2 === 1) {
+        const tmp = MatrixExponentiationRecursive(mat, m - 1)
+        return MatMult(tmp, mat)
+  } else {
+        const tmp = MatrixExponentiationRecursive(mat, m >> 1)
+        return MatMult(tmp, tmp)
+  }
+}
+
+
+
+
+
+/
+
+
+  const answer = parseFloat((number + '').replace(/^[-\d]+./, '.'))
+  return isNaN(answer) === true ? 0 : answer
+}
+/
+
+
+
+
+  if (number === 0) {
+    return true
+  }
+  const sqrt = Math.sqrt(number)
+  return sqrt % 1 !== 0 && Math.ceil(sqrt) * Math.floor(sqrt) === number
+}
+/
+
+
+const isOdd = (number) => Boolean(number % 2) /
+const isOddBitwise = (number) => Boolean(number & 1) 
+
+
+const calcRPN = (expression) => {
+  const operators = {
+    '+': (a, b) => a + b,
+    '-': (a, b) => a - b,
+    '*': (a, b) => a * b,
+    '/': (a, b) => b / a
+  }
+
+  const tokens = expression.split(' ')
+
+  const stack = []
+
+  tokens.forEach((token) => {
+    const operator = operators[token]
+
+    if (typeof operator === 'function') {
+      const a = stack.pop()
+      const b = stack.pop()
+
+      const result = operator(a, b)
+
+      stack.push(result)
+    } else {
+      stack.push(parseFloat(token))
+    }
+  })
+
+  return stack.pop()
+}
+
+
+/
+
+
+
+
+
+
+/
+
+
+
+  return radian * (180 / Math.PI)
+}
+/
+const euclideanDistance = (longitude1, latitude1, longitude2, latitude2) => {
+  const width = longitude2 - longitude1
+  const height = latitude2 - latitude1
+  return (Math.sqrt(width * width + height * height))
+}
+
+const manhattanDistance = (longitude1, latitude1, longitude2, latitude2) => {
+  const width = Math.abs(longitude2 - longitude1)
+  const height = Math.abs(latitude2 - latitude1)
+  return width + height
+}
+
+
+
+
+const perfectSquare = (num) => Math.sqrt(num) ** 2 === num
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function plotLine (label, points, width, height) {
+  
+    const container = document.createElement('div')
+  container.style.width = width + 'px'
+  container.style.height = height + 'px'
+  document.body.append(container)
+
+    const canvas = document.createElement('canvas')
+  container.append(canvas)
+
+    const chart = new Chart(canvas, {     type: 'scatter',
+    data: {
+      datasets: [{
+        label,
+        data: points,
+        showLine: true,
+        fill: false,
+        tension: 0,
+        borderColor: 'black'
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      responsive: true
+    }
+  })
+}
+
+function exampleEquation1 (x, y) {
+  return x
+}
+
+function exampleEquation2 (x, y) {
+  return y
+}
+
+function exampleEquation3 (x, y) {
+  return x + y + x * y
+}
+
+if (typeof window !== 'undefined') {
+  const points1 = eulerFull(0, 4, 0.1, 0, exampleEquation1)
+  const points2 = eulerFull(0, 4, 0.1, 1, exampleEquation2)
+  const points3 = eulerFull(0, 0.1, 0.025, 1, exampleEquation3)
+
+  const script = document.createElement('script')
+
+    script.src = 'https:  script.onload = function () {
+    plotLine('example 1: dy/dx = x', points1, 600, 400)
+    plotLine('example 2: dy/dx = y', points2, 600, 400)
+    plotLine('example 3: dy/dx = x + y + x * y', points3, 600, 400)
+  }
+  document.body.append(script)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const pronicNumbers = [0, 2, 6, 12, 20, 30, 42, 56, 72, 90, 110, 132, 156, 182, 210, 240, 272, 306, 342, 380, 420, 462, 506, 552, 600, 650, 702, 756, 812, 870, 930, 992, 1056, 1122, 1190, 1260, 1332, 1406, 1482, 1560, 1640, 1722, 1806, 1892, 1980, 2070, 2162, 2256, 2352, 2450, 2550]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function testEuclidGCD (n, m, expected) {
+  
+}
+
+testEuclidGCD(5, 20, 5)
+testEuclidGCD(109, 902, 1)
+testEuclidGCD(290, 780, 10)
+testEuclidGCD(104, 156, 52)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function testFactorial (n, expected) {
+  
+}
+
+testFactorial(3, 6)
+testFactorial(7, 5040)
+testFactorial(0, 1)
+testFactorial(12, 479001600)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+if (typeof window !== 'undefined') {
+  const rgbData = getRGBData()
+  const width = rgbData.length
+  const height = rgbData[0].length
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const ctx = canvas.getContext('2d')
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      const rgb = rgbData[x][y]
+      ctx.fillStyle = 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')'
+      ctx.fillRect(x, y, 1, 1)
+    }
+  }
+  document.body.append(canvas)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  FibonacciDpWithoutRecursion,
+  FibonacciRecursiveDP,
+  FibonacciIterative,
+  FibonacciRecursive,
+  FibonacciMatrixExpo
+} from '../Fibonacci'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  isTriangular,
+  isTetrahedral,
+  isPentatope,
+  checkAll
+} from '../FigurateNumber'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function testZeller (day, month, year, expected) {
+  
+}
+
+
+testZeller(25, 1, 2013, 'Friday')
+testZeller(26, 1, 2013, 'Saturday')
+testZeller(16, 4, 2022, 'Saturday')
+testZeller(25, 4, 2022, 'Monday')
+
+
+
+
+
+
+/
+
+
+function lucas (index) {
+    if (index < 0) throw new TypeError('Index cannot be Negative')
+
+    if (Math.floor(index) !== index) throw new TypeError('Index cannot be a Decimal')
+
+  let a = 2
+  let b = 1
+  for (let i = 0; i < index; i++) {
+    const temp = a + b
+    a = b
+    b = temp
+  }
+  return a
+}
+
+
+/
+
+const modularBinaryExponentiation = (a, n, m) => {
+      if (n === 0) {
+    return 1
+  } else if (n % 2 === 1) {
+    return (modularBinaryExponentiation(a, n - 1, m) * a) % m
+  } else {
+    const b = modularBinaryExponentiation(a, n / 2, m)
+    return (b * b) % m
+  }
+}
+
+
+
+
+const abs = (num) => {
+  const validNumber = +num 
+  if (Number.isNaN(validNumber)) {
+    throw new TypeError('Argument is NaN - Not a Number')
+  }
+
+  return validNumber < 0 ? -validNumber : validNumber }
+
+
+
+const powLinear = (base, exponent) => {
+  if (exponent < 0) {
+    base = 1 / base
+    exponent = -exponent
+  }
+
+  let result = 1
+
+  while (exponent--) {     result *= base
+  }
+
+  return result
+}
+
+
+const powFaster = (base, exponent) => {
+  if (exponent < 2) {     return base && ([1, base][exponent] || powFaster(1 / base, -exponent))
+  }
+
+  if (exponent & 1) {     return base * powFaster(base * base, exponent >> 1)   }
+
+  return powFaster(base * base, exponent / 2)
+}
+
+
+
+
+
+
+
+
+const findMin = (...nums) => {
+  if (nums.length === 0) {
+    throw new TypeError('Array is empty')
+  }
+
+  let min = nums[0]
+  for (let i = 1; i < nums.length; i++) {
+    if (nums[i] < min) {
+      min = nums[i]
+    }
+  }
+
+  return min
+}
+
+
+/
+
+
+      let res = n
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) {
+      while (n % i === 0) {
+        n = Math.floor(n / i)
+      }
+                  res = res - Math.floor(res / i)
+    }
+  }
+  if (n > 1) {
+    res = res - Math.floor(res / n)
+  }
+  return res
+}
+
+
+const PalindromeRecursive = (string) => {
+    if (string.length < 2) return true
+
+    if (string[0] !== string[string.length - 1]) {
+    return false
+  }
+
+  return PalindromeRecursive(string.slice(1, string.length - 1))
+}
+
+const PalindromeIterative = (string) => {
+  const _string = string
+    .toLowerCase()
+    .replace(/ /g, '')
+    .replace(/,/g, '')
+    .replace(/'.'/g, '')
+    .replace(/:/g, '')
+    .split('')
+
+    while (_string.length > 1) {
+    if (_string.shift() !== _string.pop()) {
+      return false
+    }
+  }
+
+  return true
+}
+
+
+/
+
+function integralEvaluation (N, a, b, func) {
+    let isNEven = true
+  if (N % 2 !== 0) isNEven = false
+
+  if (!Number.isInteger(N) || Number.isNaN(a) || Number.isNaN(b)) { throw new TypeError('Expected integer N and finite a, b') }
+  if (!isNEven) { throw Error('N is not an even number') }
+  if (N <= 0) { throw Error('N has to be >= 2') }
+
+    if (a > b) { throw Error('a must be less or equal than b') }
+  if (a === b) return 0
+
+    const h = (b - a) / N
+
+    let xi = a   const pointsArray = []
+
+    let temp
+  for (let i = 0; i < N + 1; i++) {
+    if (i === 0 || i === N) temp = func(xi)
+    else if (i % 2 === 0) temp = 2 * func(xi)
+    else temp = 4 * func(xi)
+
+    pointsArray.push(temp)
+    xi += h
+  }
+
+    let result = h / 3
+  temp = 0
+  for (let i = 0; i < pointsArray.length; i++) temp += pointsArray[i]
+
+  result *= temp
+
+  if (Number.isNaN(result)) { throw Error("Result is NaN. The input interval doesn't belong to the functions domain") }
+
+  return result
+}
+
+
+/
+
+'use strict'
+
+const findLcm = (num1, num2) => {
+    if (num1 < 1 || num2 < 1) {
+    return 'Please enter values greater than zero.'
+  }
+
+    if (num1 !== Math.round(num1) || num2 !== Math.round(num2)) {
+    return 'Please enter whole numbers.'
+  }
+
+    const maxNum = Math.max(num1, num2)
+  let lcm = maxNum
+
+  while (true) {
+    if (lcm % num1 === 0 && lcm % num2 === 0) return lcm
+    lcm += maxNum
+  }
+}
+
+
+
+
+
+  if (a === Infinity && g === 0) return NaN
+  if (Object.is(a, -0) && !Object.is(g, -0)) return 0
+  if (a === g) return a   let x   do {
+    [a, g, x] = [(a + g) / 2, Math.sqrt(a * g), a]
+  } while (a !== x && !isNaN(a))
+  /
+  return a
+}
+
+
+const BinaryConvert = (num) => {
+  let power = 1
+  let binary = 0
+
+  while (num) {
+    const rem = num % 2
+    num = Math.floor(num / 2)
+    binary = rem * power + binary
+    power *= 10
+  }
+
+  return binary
+}
+
+
+/
+
+const gridGetX = (columns, index) => {
+  while (index + 1 > columns) {
+    index = index - columns
+  }
+  return index + 1
+}
+
+const gridGetY = (columns, index) => {
+  return Math.floor(index / columns) + 1
+}
+
+
+
+
+const factorsOfANumber = (number = 0) => {
+  return Array.from(Array(number + 1).keys()).filter(
+    (num) => number % num === 0
+  )
+}
+
+
+
+const piEstimation = (iterations = 100000) => {
+  let circleCounter = 0
+
+  for (let i = 0; i < iterations; i++) {
+        const x = Math.random()
+    const y = Math.random()
+    const radius = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2))
+
+    if (radius < 1) circleCounter += 1
+  }
+
+    const pi = (circleCounter / iterations) * 4
+  return pi
+}
+
+
+
+
+const armstrongNumber = (num) => {
+  if (num < 0 || typeof num !== 'number') return false
+
+  let newSum = 0
+
+  const numArr = num.toString().split('')
+  numArr.forEach((num) => {
+    newSum += parseInt(num) ** numArr.length
+  })
+
+  return newSum === num
+}
+
+
+
+
+const findRoot = (a, b, func, numberOfIterations) => {
+    const belongsToDomain = (x, f) => {
+    const res = f(x)
+    return !Number.isNaN(res)
+  }
+  if (!belongsToDomain(a, func) || !belongsToDomain(b, func)) throw Error("Given interval is not a valid subset of function's domain")
+
+    const hasRoot = (a, b, func) => {
+    return func(a) * func(b) < 0
+  }
+  if (hasRoot(a, b, func) === false) { throw Error('Product f(a)*f(b) has to be negative so that Bolzano theorem is applied') }
+
+    const m = (a + b) / 2
+
+    if (numberOfIterations === 0) { return m }
+
+    const fm = func(m)
+  const prod1 = fm * func(a)
+  const prod2 = fm * func(b)
+
+    if (prod1 > 0 && prod2 < 0) return findRoot(m, b, func, --numberOfIterations)
+  else if (prod1 < 0 && prod2 > 0) return findRoot(a, m, func, --numberOfIterations)
+  else throw Error('Unexpected behavior')
+}
+
+
+const addRow = (triangle) => {
+  const previous = triangle[triangle.length - 1]
+  const newRow = [1]
+  for (let i = 0; i < previous.length - 1; i++) {
+    const current = previous[i]
+    const next = previous[i + 1]
+    newRow.push(current + next)
+  }
+  newRow.push(1)
+  return triangle.push(newRow)
+}
+
+const generate = (numRows) => {
+  const triangle = [[1], [1, 1]]
+
+  if (numRows === 0) {
+    return []
+  } else if (numRows === 1) {
+    return [[1]]
+  } else if (numRows === 2) {
+    return [[1], [1, 1]]
+  } else {
+    for (let i = 2; i < numRows; i++) {
+      addRow(triangle)
+    }
+  }
+  return triangle
+}
+
+
+/
+
+const PrimeCheck = (n) => {
+      if (n === 1) return false
+  if (n === 0) return false
+  if (n === 2) return true
+  if (n % 2 === 0) return false
+
+  for (let i = 3; i * i <= n; i += 2) {
+    if (n % i === 0) {
+      return false
+    }
+  }
+  return true
+}
+
+
+const sieveOfEratosthenes = (n) => {
+  /
+  const primes = new Array(n + 1)
+  primes.fill(true)   primes[0] = primes[1] = false   const sqrtn = Math.ceil(Math.sqrt(n))
+  for (let i = 2; i <= sqrtn; i++) {
+    if (primes[i]) {
+      for (let j = i * i; j <= n; j += i) {
+        /
+        primes[j] = false
+      }
+    }
+  }
+  return primes
+}
+
+
+
+
+const matrixCheck = (matrix) => {
+  let columnNumb
+  for (let index = 0; index < matrix.length; index++) {
+    if (index === 0) {
+      columnNumb = matrix[index].length
+    } else if (matrix[index].length !== columnNumb) {
+          } else {
+      return columnNumb
+    }
+  }
+}
+
+const twoMatricesCheck = (first, second) => {
+  const [firstRowLength, secondRowLength, firstColLength, secondColLength] = [first.length, second.length, matrixCheck(first), matrixCheck(second)]
+  if (firstRowLength !== secondColLength || secondRowLength !== firstColLength) {
+        return false
+  } else {
+    return true
+  }
+}
+
+const initiateEmptyArray = (first, second) => {
+  if (twoMatricesCheck(first, second)) {
+    const emptyArray = first.map(() => {
+      return ['']
+    })
+    return emptyArray
+  } else {
+    return false
+  }
+}
+
+
+  const multMatrix = initiateEmptyArray(firstArray, secondArray)
+  for (let rm = 0; rm < firstArray.length; rm++) {
+    const rowMult = []
+    for (let col = 0; col < firstArray[0].length; col++) {
+      rowMult.push(firstArray[rm][col])
+    }
+    for (let cm = 0; cm < firstArray.length; cm++) {
+      const colMult = []
+      for (let row = 0; row < secondArray.length; row++) {
+        colMult.push(secondArray[row][cm])
+      }
+      let newNumb = 0
+      for (let index = 0; index < rowMult.length; index++) {
+        newNumb += rowMult[index] * colMult[index]
+      }
+      multMatrix[rm][cm] = newNumb
+    }
+  }
+  return multMatrix
+}
+
+
+
+
+
+
+function findMaxRecursion (arr, left, right) {
+  const len = arr.length
+
+  if (len === 0 || !arr) {
+    return undefined
+  }
+
+  if (left >= len || left < -len || right >= len || right < -len) {
+    throw new Error('Index out of range')
+  }
+
+  if (left === right) {
+    return arr[left]
+  }
+
+    const mid = (left + right) >> 1
+
+  const leftMax = findMaxRecursion(arr, left, mid)
+  const rightMax = findMaxRecursion(arr, mid + 1, right)
+
+    return Math.max(leftMax, rightMax)
+}
+
+
+/
+
+/
+function sumOfDigitsUsingString (number) {
+  if (number < 0) number = -number
+
+  return Number.parseInt(number.toString().split('').reduce((a, b) => Number(a) + Number(b)))
+}
+
+/
+function sumOfDigitsUsingLoop (number) {
+  if (number < 0) number = -number
+  let res = 0
+
+  while (number > 0) {
+    res += number % 10
+    number = Math.floor(number / 10)
+  }
+
+  return res
+}
+
+/
+function sumOfDigitsUsingRecursion (number) {
+  if (number < 0) number = -number
+
+  if (number < 10) return number
+
+  return (number % 10) + sumOfDigitsUsingRecursion(Math.floor(number / 10))
+}
+
+
+/
+
+const gcdOfTwoNumbers = (x, y) => {
+            return x === 0 ? y : gcdOfTwoNumbers(y % x, x)
+}
+
+const eulersTotientFunction = (n) => {
+  let countOfRelativelyPrimeNumbers = 1
+  for (let iterator = 2; iterator <= n; iterator++) {
+    if (gcdOfTwoNumbers(iterator, n) === 1) countOfRelativelyPrimeNumbers++
+  }
+  return countOfRelativelyPrimeNumbers
+}
+
+
+/
+
+const GetEuclidGCD = (arg1, arg2) => {
+  let less = arg1 > arg2 ? arg2 : arg1
+  for (less; less >= 2; less--) {
+    if ((arg1 % less === 0) && (arg2 % less === 0)) return (less)
+  }
+  return (less)
+}
+
+
+const CoPrimeCheck = (firstNumber, secondNumber) => {
+    if (typeof firstNumber !== 'number' || typeof secondNumber !== 'number') {
+    return new TypeError('Argument is not a number.')
+  }
+  /
+  return GetEuclidGCD(firstNumber, secondNumber) === 1
+}
+
+
+
+
+const mean = (nums) => {
+  if (!Array.isArray(nums)) {
+    throw new TypeError('Invalid Input')
+  }
+
+    const sum = nums.reduce((sum, cur) => sum + cur, 0)
+
+    return sum / nums.length
+}
+
+
+/
+
+const averageMedian = (sourceArrayOfNumbers) => {
+  let numbers = [...sourceArrayOfNumbers]
+  let median = 0
+  const numLength = numbers.length
+  numbers = numbers.sort(sortNumbers)
+
+  if (numLength % 2 === 0) {
+    median = (numbers[numLength / 2 - 1] + numbers[numLength / 2]) / 2
+  } else {
+    median = numbers[(numLength - 1) / 2]
+  }
+
+  return median
+}
+
+const sortNumbers = (num1, num2) => {
+  return num1 - num2
+}
+
+
+/
+
+
+
+  return degree * (Math.PI / 180)
+}
+/
+
+
+const GetEuclidGCD = (arg1, arg2) => {
+    if (typeof arg1 !== 'number' || typeof arg2 !== 'number') {
+    return new TypeError('Argument is not a number.')
+  }
+    if (arg1 < 1 || arg2 < 1) {
+    return new TypeError('Argument is a negative number.')
+  }
+    let less = arg1 > arg2 ? arg2 : arg1
+    for (less; less >= 2; less--) {
+    if ((arg1 % less === 0) && (arg2 % less === 0)) return (less)
+  }
+  return (less)
+}
+
+
+
+
+
+const factorial = (n) => {
+  if (n >= 0) {
+    if (n === 0) {
+      return 1
+    } else {
+      return n * factorial(n - 1)
+    }
+  } else {
+    return NaN
+  }
+}
+
+
+const permutation = (n, r) => {
+  return factorial(n) / factorial(n - r)
+}
+
+
+const combination = (n, r) => {
+  return factorial(n) / (factorial(r) * factorial(n - r))
+}
+
+
+
+
+const numberOfDigit = (n) => Math.abs(n).toString().length
+
+
+
+
+
+const extendedEuclideanGCD = (arg1, arg2) => {
+  if (typeof arg1 !== 'number' || typeof arg2 !== 'number') throw new TypeError('Not a Number')
+  if (arg1 < 1 || arg2 < 1) throw new TypeError('Must be positive numbers')
+
+    if (arg1 < arg2) {
+    const res = extendedEuclideanGCD(arg2, arg1)
+    const temp = res[1]
+    res[1] = res[2]
+    res[2] = temp
+    return res
+  }
+
+  
+    let r0 = arg1
+  let r1 = arg2
+
+    let s0 = 1
+  let s1 = 0
+
+    let t0 = 0
+  let t1 = 1
+
+  while (r1 !== 0) {
+    const q = Math.floor(r0 / r1)
+
+    const r2 = r0 - r1 * q
+    const s2 = s0 - s1 * q
+    const t2 = t0 - t1 * q
+
+    r0 = r1
+    r1 = r2
+    s0 = s1
+    s1 = s2
+    t0 = t1
+    t1 = t2
+  }
+  return [r0, s0, t0]
+}
+
+
+/
+
+
+function aliquotSum (input) {
+    if (input < 0) throw new TypeError('Input cannot be Negative')
+
+    if (Math.floor(input) !== input) throw new TypeError('Input cannot be a Decimal')
+
+    if (input === 1) return 0
+
+  let sum = 0
+  for (let i = 1; i <= (input / 2); i++) {
+    if (input % i === 0) sum += i
+  }
+
+  return sum
+}
+
+
+
+
+
+function twinPrime (n) {
+  const prime = PrimeCheck(n)
+
+  if (!prime) {
+    return -1
+  }
+
+  if (!PrimeCheck(n + 2)) {
+    return -1
+  }
+
+  return n + 2
+}
+
+
+
+
+    return yCurrent + stepSize * differentialEquation(xCurrent, yCurrent)
+}
+
+
+    const points = [{ x: xStart, y: yStart }]
+  let yCurrent = yStart
+  let xCurrent = xStart
+
+  while (xCurrent < xEnd) {
+        yCurrent = eulerStep(xCurrent, stepSize, yCurrent, differentialEquation)
+    xCurrent += stepSize
+    points.push({ x: xCurrent, y: yCurrent })
+  }
+
+  return points
+}
+/
+
+const findHCF = (x, y) => {
+    if (x < 1 || y < 1) {
+    return 'Please enter values greater than zero.'
+  }
+
+    if (x !== Math.round(x) || y !== Math.round(y)) {
+    return 'Please enter whole numbers.'
+  }
+
+    while (Math.max(x, y) % Math.min(x, y) !== 0) {
+    if (x > y) {
+      x %= y
+    } else {
+      y %= x
+    }
+  }
+
+    return Math.min(x, y)
+}
+
+
+
+
+  if (!Number.isFinite(num1) || !Number.isFinite(num2)) {
+    throw new TypeError('Expected a number')
+  }
+  if (num2 === 0) {
+    return false
+  }
+  return num1 % num2 === 0
+}
+
+/
+
+    let result = 1
+    while (num > 1) {
+    result *= num     num--   }
+    return result
+}
+
+
+const factorsExcludingNumber = (n) => {
+  return [...Array(n).keys()].filter((num) => n % num === 0)
+}
+
+const perfectNumber = (n) => {
+  const factorSum = factorsExcludingNumber(n).reduce((num, initialValue) => {
+    return num + initialValue
+  }, 0)
+
+  return factorSum === n
+}
+
+
+const list = []
+
+const FibonacciIterative = (nth) => {
+  const sequence = []
+
+  if (nth >= 1) sequence.push(1)
+  if (nth >= 2) sequence.push(1)
+
+  for (let i = 2; i < nth; i++) {
+    sequence.push(sequence[i - 1] + sequence[i - 2])
+  }
+
+  return sequence
+}
+
+const FibonacciRecursive = (number) => {
+  return (() => {
+    switch (list.length) {
+      case 0:
+        list.push(1)
+        return FibonacciRecursive(number)
+      case 1:
+        list.push(1)
+        return FibonacciRecursive(number)
+      case number:
+        return list
+      default:
+        list.push(list[list.length - 1] + list[list.length - 2])
+        return FibonacciRecursive(number)
+    }
+  })()
+}
+
+const dict = new Map()
+
+const FibonacciRecursiveDP = (stairs) => {
+  if (stairs <= 0) return 0
+  if (stairs === 1) return 1
+
+    if (dict.has(stairs)) return dict.get(stairs)
+
+  const res =
+    FibonacciRecursiveDP(stairs - 1) + FibonacciRecursiveDP(stairs - 2)
+
+  dict.set(stairs, res)
+
+  return res
+}
+
+
+const FibonacciDpWithoutRecursion = (number) => {
+  const table = []
+  table.push(1)
+  table.push(1)
+  for (let i = 2; i < number; ++i) {
+    table.push(table[i - 1] + table[i - 2])
+  }
+  return table
+}
+
+
+const copyMatrix = (A) => {
+  return A.map(row => row.map(cell => cell))
+}
+
+const Identity = (size) => {
+  const I = Array(size).fill(null).map(() => Array(size).fill())
+  return I.map((row, rowIdx) => row.map((_col, colIdx) => {
+    return rowIdx === colIdx ? 1 : 0
+  }))
+}
+
+const matrixMultiply = (A, B) => {
+  A = copyMatrix(A)
+  B = copyMatrix(B)
+  const l = A.length
+  const m = B.length
+  const n = B[0].length   const C = Array(l).fill(null).map(() => Array(n).fill())
+  for (let i = 0; i < l; i++) {
+    for (let j = 0; j < n; j++) {
+      C[i][j] = 0
+      for (let k = 0; k < m; k++) {
+        C[i][j] += A[i][k] * B[k][j]
+      }
+    }
+  }
+  return C
+}
+
+
+const matrixExpo = (A, n) => {
+  A = copyMatrix(A)
+
+    let result = Identity(A.length)   while (n > 0) {
+    if (n % 2 !== 0) result = matrixMultiply(result, A)
+    n = Math.floor(n / 2)
+    if (n > 0) A = matrixMultiply(A, A)
+  }
+  return result
+}
+
+const FibonacciMatrixExpo = (n) => {
+      
+      
+      
+  if (n === 0) return 0
+
+  const A = [
+    [1, 1],
+    [1, 0]
+  ]
+  const poweredA = matrixExpo(A, n - 1)   let F = [
+    [1],
+    [0]
+  ]
+  F = matrixMultiply(poweredA, F)
+  return F[0][0]
+}
+
+
+
+
+
+
+
+const Softmax = (inputs) => {
+  const eulerExpOfAllInputs = inputs.map(input => Math.exp(input))
+  const sumOfEulerExpOfAllInputs = eulerExpOfAllInputs.reduce((a, b) => a + b)
+
+  return inputs.map((input) => {
+    const eulerExpInputs = Math.exp(input)
+    return eulerExpInputs / sumOfEulerExpOfAllInputs
+  })
+}
+
+
+
+  if (typeof day !== 'number' || typeof month !== 'number' || typeof year !== 'number') {
+    throw new TypeError('Arguments are not all numbers.')
+  }
+  const q = day
+  let m = month
+  let y = year
+  if (month < 3) {
+    m += 12
+    y -= 1
+  }
+  day =
+      (q + Math.floor(26 * (m + 1) / 10) + (y % 100) + Math.floor((y % 100) / 4) + Math.floor(Math.floor(y / 100) / 4) + (5 * Math.floor(y / 100))) %
+          7
+  const days = [
+    'Saturday',
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday'
+  ]
+  return days[day]
+}
+
+class Polynomial {
+  constructor (array) {
+    this.coefficientArray = array     this.polynomial = ''     this.construct()
+  }
+
+  /
+  construct () {
+    this.polynomial = this.coefficientArray
+      .map((coefficient, exponent) => {
+        if (coefficient === 0) {
+          return '0'
+        }
+        if (exponent === 0) {
+          return `(${coefficient})`
+        } else if (exponent === 1) {
+          return `(${coefficient}x)`
+        } else {
+          return `(${coefficient}x^${exponent})`
+        }
+      })
+      .filter((x) =>
+        x !== '0'
+      )
+      .reverse()
+      .join(' + ')
+  }
+
+  /
+  display () {
+    return this.polynomial
+  }
+
+  /
+  evaluate (value) {
+    return this.coefficientArray.reduce((result, coefficient, exponent) => {
+      return result + coefficient * Math.pow(value, exponent)
+    }, 0)
+  }
+}
+
+
+/
+
+
+const surfaceAreaCube = (side) => {
+  validateNumericParam(side, 'side')
+  return 6 * side ** 2
+}
+
+
+const surfaceAreaSphere = (radius) => {
+  validateNumericParam(radius, 'radius')
+  return 4.0 * Math.PI * radius ** 2.0
+}
+
+
+const areaRectangle = (length, width) => {
+  validateNumericParam(length, 'Length')
+  validateNumericParam(width, 'Width')
+  return width * length
+}
+
+
+const areaSquare = (side) => {
+  validateNumericParam(side, 'square side')
+  return side ** 2
+}
+
+
+const areaTriangle = (base, height) => {
+  validateNumericParam(base, 'Base')
+  validateNumericParam(height, 'Height')
+  return (base * height) / 2.0
+}
+
+
+const areaTriangleWithAllThreeSides = (side1, side2, side3) => {
+  validateNumericParam(side1, 'side1')
+  validateNumericParam(side2, 'side2')
+  validateNumericParam(side3, 'side3')
+  if (
+    side1 + side2 <= side3 ||
+    side1 + side3 <= side2 ||
+    side2 + side3 <= side1
+  ) {
+    throw new TypeError('Invalid Triangle sides.')
+  }
+    const semi = (side1 + side2 + side3) / 2
+
+    const area = Math.sqrt(
+    semi * (semi - side1) * (semi - side2) * (semi - side3)
+  )
+  return Number(area.toFixed(2))
+}
+
+
+const areaParallelogram = (base, height) => {
+  validateNumericParam(base, 'Base')
+  validateNumericParam(height, 'Height')
+  return base * height
+}
+
+
+const areaTrapezium = (base1, base2, height) => {
+  validateNumericParam(base1, 'Base One')
+  validateNumericParam(base2, 'Base Two')
+  validateNumericParam(height, 'Height')
+  return (1 / 2) * (base1 + base2) * height
+}
+
+
+const areaCircle = (radius) => {
+  validateNumericParam(radius, 'Radius')
+  return Math.PI * radius ** 2
+}
+
+
+const areaRhombus = (diagonal1, diagonal2) => {
+  validateNumericParam(diagonal1, 'diagonal one')
+  validateNumericParam(diagonal2, 'diagonal two')
+  return (1 / 2) * diagonal1 * diagonal2
+}
+
+const validateNumericParam = (param, paramName = 'param') => {
+  if (typeof param !== 'number') {
+    throw new TypeError('The ' + paramName + ' should be type Number')
+  } else if (param < 0) {
+    throw new Error('The ' + paramName + ' only accepts non-negative values')
+  }
+}
+
+
+  surfaceAreaCube,
+  surfaceAreaSphere,
+  areaRectangle,
+  areaSquare,
+  areaTriangle,
+  areaParallelogram,
+  areaTrapezium,
+  areaCircle,
+  areaRhombus,
+  areaTriangleWithAllThreeSides
+}
+
+const meanSquaredError = (predicted, expected) => {
+  if (!Array.isArray(predicted) || !Array.isArray(expected)) {
+    throw new TypeError('Argument must be an Array')
+  }
+
+  if (predicted.length !== expected.length) {
+    throw new TypeError('The two lists must be of equal length')
+  }
+
+  let err = 0
+
+  for (let i = 0; i < expected.length; i++) {
+    err += (expected[i] - predicted[i]) ** 2
+  }
+
+  return err / expected.length
+}
+
+
+/
+
+
+      const primeFactors = []
+  for (let i = 2; i * i <= n; i++) {
+    while (n % i === 0) {
+      primeFactors.push(i)
+      n = Math.floor(n / i)
+    }
+  }
+  if (n > 1) {
+    primeFactors.push(n)
+  }
+  return primeFactors
+}
+
+
+  if (base < 2 || base > 10) {
+    throw new RangeError('Unsupported base. Must be in range [2, 10]')
+  }
+
+  if (a === 0) {
+    return [0, [], undefined]
+  }
+
+  if (a === b && dlen === 0) {
+    return [1, [], undefined]
+  }
+
+      d[a] = dlen++
+
+  if (a < b) {
+    exp.push(0)
+    return decExp(a * base, b, base, exp, d, dlen)
+  }
+
+    const r = a % b
+  const q = (a - r) / b
+
+    exp.push(+q.toString(base))
+
+  if (r === 0) {
+        return [exp[0], exp.slice(1), undefined]
+  }
+
+    a = r * base
+
+      if (a in d) {
+    return [exp[0], exp.slice(1), d[a] - 1]
+  }
+
+  return decExp(a, b, base, exp, d, dlen)
+}
+const LinearSieve = (n) => {
+  /
+  const isnPrime = new Array(n + 1)
+  isnPrime[0] = isnPrime[1] = true
+  const primes = []
+  for (let i = 2; i <= n; i++) {
+    if (!isnPrime[i]) primes.push(i)
+    for (const p of primes) {
+      const k = i * p
+      if (k > n) break
+      isnPrime[k] = true
+      if (i % p === 0) break
+    }
+  }
+  return primes
+}
+
+
+
+
+  imageWidth = 800,
+  imageHeight = 600,
+  figureCenterX = -0.6,
+  figureCenterY = 0,
+  figureWidth = 3.2,
+  maxStep = 50,
+  useDistanceColorCoding = true) {
+  if (imageWidth <= 0) {
+    throw new Error('imageWidth should be greater than zero')
+  }
+
+  if (imageHeight <= 0) {
+    throw new Error('imageHeight should be greater than zero')
+  }
+
+  if (maxStep <= 0) {
+    throw new Error('maxStep should be greater than zero')
+  }
+
+  const rgbData = []
+  const figureHeight = figureWidth / imageWidth * imageHeight
+
+    for (let imageX = 0; imageX < imageWidth; imageX++) {
+    rgbData[imageX] = []
+    for (let imageY = 0; imageY < imageHeight; imageY++) {
+            const figureX = figureCenterX + (imageX / imageWidth - 0.5) * figureWidth
+      const figureY = figureCenterY + (imageY / imageHeight - 0.5) * figureHeight
+
+      const distance = getDistance(figureX, figureY, maxStep)
+
+            rgbData[imageX][imageY] =
+        useDistanceColorCoding
+          ? colorCodedColorMap(distance)
+          : blackAndWhiteColorMap(distance)
+    }
+  }
+
+  return rgbData
+}
+
+
+function blackAndWhiteColorMap (distance) {
+  return distance >= 1 ? [0, 0, 0] : [255, 255, 255]
+}
+
+
+function colorCodedColorMap (distance) {
+  if (distance >= 1) {
+    return [0, 0, 0]
+  } else {
+            const hue = 360 * distance
+    const saturation = 1
+    const val = 255
+    const hi = (Math.floor(hue / 60)) % 6
+    const f = hue / 60 - Math.floor(hue / 60)
+
+    const v = val
+    const p = 0
+    const q = Math.floor(val * (1 - f * saturation))
+    const t = Math.floor(val * (1 - (1 - f) * saturation))
+
+    switch (hi) {
+      case 0:
+        return [v, t, p]
+      case 1:
+        return [q, v, p]
+      case 2:
+        return [p, v, t]
+      case 3:
+        return [p, q, v]
+      case 4:
+        return [t, p, v]
+      default:
+        return [v, p, q]
+    }
+  }
+}
+
+
+function getDistance (figureX, figureY, maxStep) {
+  let a = figureX
+  let b = figureY
+  let currentStep = 0
+  for (let step = 0; step < maxStep; step++) {
+    currentStep = step
+    const aNew = a * a - b * b + figureX
+    b = 2 * a * b + figureY
+    a = aNew
+
+            if (a * a + b * b > 4) {
+      break
+    }
+  }
+  return currentStep / (maxStep - 1)
+}
+/
+
+
+const modularExponentiation = (base, exponent, modulus) => {
+  if (modulus === 1) return 0 
+  let result = 1
+  base %= modulus 
+  while (exponent > 0) {
+        if (exponent % 2 === 1) {
+      result = (result * base) % modulus
+      exponent--
+    } else {
+      exponent = exponent / 2       base = (base * base) % modulus
+    }
+  }
+
+  return result
+}
+
+
+const fermatPrimeCheck = (n, numberOfIterations = 50) => {
+    if (n <= 1 || n === 4) return false
+  if (n <= 3) return true 
+  for (let i = 0; i < numberOfIterations; i++) {
+        const randomNumber = Math.floor(Math.random() * (n - 2) + 2)
+
+        if (modularExponentiation(randomNumber, n - 1, n) !== 1) {
+      return false
+    }
+  }
+
+      return true
+}
+
+
+/
+
+/
+const volCuboid = (width, length, height) => {
+  isNumber(width, 'Width')
+  isNumber(length, 'Length')
+  isNumber(height, 'Height')
+  return (width * length * height)
+}
+
+/
+const volCube = (length) => {
+  isNumber(length, 'Length')
+  return (length ** 3)
+}
+
+/
+const volCone = (radius, height) => {
+  isNumber(radius, 'Radius')
+  isNumber(height, 'Height')
+  return (Math.PI * radius ** 2 * height / 3.0)
+}
+
+/
+const volPyramid = (baseLength, baseWidth, height) => {
+  isNumber(baseLength, 'BaseLength')
+  isNumber(baseWidth, 'BaseWidth')
+  isNumber(height, 'Height')
+  return (baseLength * baseWidth * height) / 3.0
+}
+
+/
+const volCylinder = (radius, height) => {
+  isNumber(radius, 'Radius')
+  isNumber(height, 'Height')
+  return (Math.PI * radius ** 2 * height)
+}
+
+/
+const volTriangularPrism = (baseLengthTriangle, heightTriangle, height) => {
+  isNumber(baseLengthTriangle, 'BaseLengthTriangle')
+  isNumber(heightTriangle, 'HeightTriangle')
+  isNumber(height, 'Height')
+  return (1 / 2 * baseLengthTriangle * heightTriangle * height)
+}
+
+/
+const volPentagonalPrism = (pentagonalLength, pentagonalBaseLength, height) => {
+  isNumber(pentagonalLength, 'PentagonalLength')
+  isNumber(pentagonalBaseLength, 'PentagonalBaseLength')
+  isNumber(height, 'Height')
+  return (5 / 2 * pentagonalLength * pentagonalBaseLength * height)
+}
+
+/
+const volSphere = (radius) => {
+  isNumber(radius, 'Radius')
+  return (4 / 3 * Math.PI * radius ** 3)
+}
+
+/
+const volHemisphere = (radius) => {
+  isNumber(radius, 'Radius')
+  return (2.0 * Math.PI * radius ** 3) / 3.0
+}
+
+const isNumber = (number, noName = 'number') => {
+  if (typeof number !== 'number') {
+    throw new TypeError('The ' + noName + ' should be Number type')
+  } else if (number < 0 || (!Number.isFinite(number))) {
+    throw new Error('The ' + noName + ' only accepts positive values')
+  }
+}
+
+
+
+
+
+const exponent = (x, n) => {
+  let answer = 1
+  while (n > 0) {
+    if (n % 2 !== 0) answer *= x
+    n = Math.floor(n / 2)
+    if (n > 0) x *= x
+  }
+  return answer
+}
+
+
+
+
+
+const powLogarithmic = (x, n) => {
+  if (n === 0) return 1
+  const result = powLogarithmic(x, Math.floor(n / 2))
+  if (isEven(n)) {
+    return result * result
+  }
+  return result * result * x
+}
+
+
+/
+
+'use strict'
+
+const calcRange = (num) => {
+  return [...Array(num).keys()].map(i => i + 1)
+}
+
+const calcFactorial = (num) => {
+  if (num === 0) {
+    return 'The factorial of 0 is 1.'
+  }
+  if (num < 0) {
+    return 'Sorry, factorial does not exist for negative numbers.'
+  }
+  if (!num) {
+    return 'Sorry, factorial does not exist for null or undefined numbers.'
+  }
+  if (num > 0) {
+    const range = calcRange(num)
+    const factorial = range.reduce((a, c) => a * c, 1)
+    return `The factorial of ${num} is ${factorial}`
+  }
+}
+
+
+/
+
+
+const ReverseNumber = (number) => {
+    if (typeof number !== 'number') {
+    return new TypeError('Argument is not a number.')
+  }
+    let reverseNumber = 0
+    while (number > 0) {
+        const lastDigit = number % 10
+        reverseNumber = reverseNumber * 10 + lastDigit
+        number = Math.floor(number / 10)
+  }
+  return reverseNumber
+}
+
+
+
+
+  const steps = []
+
+  while (n !== 1) {
+    if (n % 2 === 0) {
+      n = n / 2
+    } else {
+      n = 3 * n + 1
+    }
+
+    steps.push(n)
+  }
+
+  return { result: n, steps: steps }
+}
+
+
+
+const isTriangular = (number) => {
+  for (let i = 0; i <= number; i++) {
+    if ((i * (i + 1)) / 2 === number) {
+      return true
+    } else if ((i * (i + 1)) / 2 > number) {
+      return false
+    }
+  }
+  return false
+}
+
+
+const isTetrahedral = (number) => {
+  for (let i = 1; i <= number; i++) {
+    if ((i * (i + 1) * (i + 2)) / 6 === number) {
+      return true
+    } else if ((i * (i + 1) * (i + 2)) / 6 > number) {
+      return false
+    }
+  }
+  return false
+}
+
+const isPentatope = (number) => {
+  for (let i = 1; i <= number; i++) {
+    if ((i * (i + 1) * (i + 2) * (i + 3)) / 24 === number) {
+      return true
+    } else if ((i * (i + 1) * (i + 2) * (i + 3)) / 24 > number) {
+      return false
+    }
+  }
+  return false
+}
+
+
+const checkAll = (number) => {
+  return {
+    isTriangular: isTriangular(number),
+    isTetrahedral: isTetrahedral(number),
+    isPentatope: isPentatope(number)
+  }
+}
+
+
+
+
+/
+
+
+function sumOfGeometricProgression (firstTerm, commonRatio, numOfTerms) {
+  if (!Number.isFinite(numOfTerms)) {
+    /
+    if (Math.abs(commonRatio) < 1) return firstTerm / (1 - commonRatio)
+    throw new Error('The geometric progression is diverging, and its sum cannot be calculated')
+  }
+
+  if (commonRatio === 1) return firstTerm * numOfTerms
+
+  return (firstTerm * (Math.pow(commonRatio, numOfTerms) - 1)) / (commonRatio - 1)
+}
+
+
+
+const validateEmail = (str) => {
+  if (str === '' || str === null) {
+    throw new TypeError('Email Address String Null or Empty.')
+  }
+
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.
+}
+
+
+
+const upper = (str) => {
+  if (typeof str !== 'string') {
+    throw new TypeError('Argument should be string')
+  }
+
+  return str.replace(
+    /[a-z]/g, (char) => String.fromCharCode(char.charCodeAt() - 32)
+  )
+}
+
+
+
+
+
+const checkSnakeCase = (varName) => {
+    if (typeof varName !== 'string') {
+    throw new TypeError('Argument is not a string.')
+  }
+
+  const pat = /(.*?)_([a-zA-Z])*/
+  return pat.
+}
+
+
+
+
+
+const isScramble = (s1, s2) => {
+  return helper({}, s1, s2)
+}
+
+const helper = function (dp, s1, s2) {
+  const map = {}
+
+  if (dp[s1 + s2] !== undefined) return dp[s1 + s2]
+  if (s1 === s2) return true
+
+  for (let j = 0; j < s1.length; j++) {
+    if (map[s1[j]] === undefined) map[s1[j]] = 0
+    if (map[s2[j]] === undefined) map[s2[j]] = 0
+    map[s1[j]]++
+    map[s2[j]]--
+  }
+
+  for (const key in map) {
+    if (map[key] !== 0) {
+      dp[s1 + s2] = false
+      return false
+    }
+  }
+
+  for (let i = 1; i < s1.length; i++) {
+    if (
+      (helper(dp, s1.substr(0, i), s2.substr(0, i)) &&
+        helper(dp, s1.substr(i), s2.substr(i))) ||
+      (helper(dp, s1.substr(0, i), s2.substr(s2.length - i)) &&
+        helper(dp, s1.substr(i), s2.substr(0, s2.length - i)))
+    ) {
+      dp[s1 + s2] = true
+      return true
+    }
+  }
+
+  dp[s1 + s2] = false
+  return false
+}
+
+
+
+const checkExceeding = (str) => {
+  if (typeof str !== 'string') {
+    throw new TypeError('Argument is not a string')
+  }
+
+  const upperChars = str
+    .toUpperCase()
+    .replace(/[^A-Z]/g, '') 
+  const adjacentDiffList = []
+
+  for (let i = 0; i < upperChars.length - 1; i++) {
+        const { [i]: char, [i + 1]: adjacentChar } = upperChars
+
+    if (char !== adjacentChar) {
+      adjacentDiffList.push(
+        Math.abs(char.charCodeAt() - adjacentChar.charCodeAt())
+      )
+    }
+  }
+
+  for (let i = 0; i < adjacentDiffList.length - 1; i++) {
+    const { [i]: charDiff, [i + 1]: secondCharDiff } = adjacentDiffList
+
+    if (charDiff > secondCharDiff) {
+      return false
+    }
+  }
+
+  return true
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
