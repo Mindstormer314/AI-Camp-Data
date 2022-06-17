@@ -131,21 +131,9 @@ package com.thealgorithms.misc;
 
 import java.util.*;
 
-/*
-*A matrix is sparse if many of its coefficients are zero (In general if 2/3rd of matrix elements are 0, it is considered as sparse). 
-*The interest in sparsity arises because its exploitation can lead to enormous computational savings and because many large matrix problems that occur in practice are sparse.
-*
-* @author Ojasva Jain
- */
 
 class Sparcity {
 
-    /*
-    * @return Sparcity of matrix
-    * 
-    * where sparcity = number of zeroes/total elements in matrix
-    *
-     */
     static double sparcity(double[][] mat) {
         int zero = 0;
                 for (int i = 0; i < mat.length; i++) {
@@ -270,12 +258,6 @@ package com.thealgorithms.misc;
 
 import java.util.Scanner;
 
-/*
-* Wikipedia link : https:*
-* Here we use gauss elimination method to find the inverse of a given matrix.
-* To understand gauss elimination method to find inverse of a matrix: https:*
-* We can also find the inverse of a matrix 
- */
 public class InverseOfMatrix {
 
     public static void main(String argv[]) {
@@ -486,27 +468,15 @@ import java.util.Scanner;
 public class matrixTranspose {
 
     public static void main(String[] args) {
-        /*
-     * This is the main method
-     *
-     * @param args Unused.
-     *
-     * @return Nothing.
-         */
+       
         Scanner sc = new Scanner(System.in);
         int i, j, row, column;
         System.out.println("Enter the number of rows in the 2D matrix:");
 
-        /*
-     * Take input from user for how many rows to be print
-         */
         row = sc.nextInt();
 
         System.out.println("Enter the number of columns in the 2D matrix:");
 
-        /*
-     * Take input from user for how many coloumn to be print
-         */
         column = sc.nextInt();
         int[][] arr = new int[row][column];
         System.out.println("Enter the elements");
@@ -516,9 +486,6 @@ public class matrixTranspose {
             }
         }
 
-        /*
-     * Print matrix before the Transpose in proper way
-         */
         System.out.println("The matrix is:");
         for (i = 0; i < row; i++) {
             for (j = 0; j < column; j++) {
@@ -527,11 +494,7 @@ public class matrixTranspose {
             System.out.print("\n");
         }
 
-        /*
-     * Print matrix after the tranpose in proper way Transpose means Interchanging
-     * of rows wth column so we interchange the rows in next loop Thus at last
-     * matrix of transpose is obtained through user input...
-         */
+      
         System.out.println("The Transpose of the given matrix is:");
         for (i = 0; i < column; i++) {
             for (j = 0; j < row; j++) {
@@ -625,10 +588,6 @@ public class MedianOfRunningArray {
         public MedianOfRunningArray() {
         this.p1 = new PriorityQueue<>(Collections.reverseOrder());         this.p2 = new PriorityQueue<>();     }
 
-    /*
-      Inserting lower half of array to max Heap
-      and upper half to min heap
-     */
     public void insert(Integer e) {
         p2.add(e);
         if (p2.size() - p1.size() > 1) {
@@ -636,9 +595,6 @@ public class MedianOfRunningArray {
         }
     }
 
-    /*
-      Returns median at any given point
-     */
     public Integer median() {
         if (p1.size() == p2.size()) {
             return (p1.peek() + p2.peek()) / 2;
@@ -647,9 +603,6 @@ public class MedianOfRunningArray {
     }
 
     public static void main(String[] args) {
-        /*
-        Testing the median function
-         */
 
         MedianOfRunningArray p = new MedianOfRunningArray();
         int arr[] = {10, 7, 4, 9, 2, 3, 11, 17, 14};
@@ -1793,13 +1746,6 @@ package com.thealgorithms.searches;
 
 import com.thealgorithms.devutils.searches.SearchAlgorithm;
 
-/*
-*  Fibonacci Search is a popular algorithm which finds the position of a target value in
-*  a sorted array
-*
-*  The time complexity for this search algorithm is O(log3(n))
-*  The space complexity for this search algorithm is O(1)
-*  @author Kanakalatha Vemuru (https: */
 public class FibonacciSearch implements SearchAlgorithm {
 
     
@@ -1998,27 +1944,6 @@ package com.thealgorithms.searches;
 
 import java.util.*;
 
-/*
-    Problem Statement: 
-    Given an array, find out how many times it has to been rotated 
-    from its initial sorted position.
-    Input-Output:
-    Eg. [11,12,15,18,2,5,6,8]
-    It has been rotated: 4 times
-    (One rotation means putting the first element to the end)
-    Note: The array cannot contain duplicates
-
-    Logic: 
-    The position of the minimum element will give the number of times the array has been rotated
-    from its initial sorted position.
-    Eg. For [2,5,6,8,11,12,15,18], 1 rotation gives [5,6,8,11,12,15,18,2], 2 rotations [6,8,11,12,15,18,2,5] and so on.
-    Finding the minimum element will take O(N) time but, we can  use Binary Search to find the mimimum element, we can reduce the complexity to O(log N).
-    If we look at the rotated array, to identify the minimum element (say a[i]), we observe that  a[i-1]>a[i]<a[i+1].
-
-    Some other test cases: 
-    1. [1,2,3,4] Number of rotations: 0 or 4(Both valid)
-    2. [15,17,2,3,5] Number of rotations: 3
- */
 class HowManyTimesRotated {
 
     public static void main(String[] args) {
@@ -2073,9 +1998,7 @@ public class JumpSearch implements SearchAlgorithm {
     @Override
     public <T extends Comparable<T>> int find(T[] array, T key) {
         int length = array.length;
-        /* length of array */
         int blockSize = (int) Math.sqrt(length);
-        /* block size to be jumped */
 
         int limit = blockSize;
         while (key.compareTo(array[limit]) > 0 && limit < array.length - 1) {
@@ -2084,12 +2007,10 @@ public class JumpSearch implements SearchAlgorithm {
 
         for (int i = limit - blockSize; i <= limit; i++) {
             if (array[i] == key) {
-                /* execute linear search */
                 return i;
             }
         }
         return -1;
-        /* not found */
     }
 }
 package com.thealgorithms.searches;
@@ -2244,20 +2165,18 @@ public class TernarySearch implements SearchAlgorithm {
         if (start > end) {
             return -1;
         }
-        /* First boundary: add 1/3 of length to start */
         int mid1 = start + (end - start) / 3;
-        /* Second boundary: add 2/3 of length to start */
         int mid2 = start + 2 * (end - start) / 3;
 
         if (key.compareTo(arr[mid1]) == 0) {
             return mid1;
         } else if (key.compareTo(arr[mid2]) == 0) {
             return mid2;
-        } /* Search the first (1/3) rd part of the array.*/ else if (key.compareTo(arr[mid1]) < 0) {
+        } else if (key.compareTo(arr[mid1]) < 0) {
             return ternarySearch(arr, key, start, --mid1);
-        } /* Search 3rd (1/3)rd part of the array */ else if (key.compareTo(arr[mid2]) > 0) {
+        } else if (key.compareTo(arr[mid2]) > 0) {
             return ternarySearch(arr, key, ++mid2, end);
-        } /* Search middle (1/3)rd part of the array */ else {
+        } else {
             return ternarySearch(arr, key, mid1, mid2);
         }
     }
@@ -2469,18 +2388,6 @@ public class HorspoolSearch {
     }
 }
 package com.thealgorithms.strings;
-
-/*
-Backtracking algorithm used in the program:-
-
->>Fix a character in the first position and swap the rest of the character with the first character.
-  Like in ABC, in the first iteration three strings are formed: ABC, BAC, and CBA by swapping A with
-  A, B and C respectively.
->>Repeat step 1 for the rest of the characters like fixing second character B and so on.
->>Now swap again to go back to the previous position. E.g., from ABC, we formed ABC by fixing B again,
-  and we backtrack to the previous position and swap B with C. So, now we got ABC and ACB.
->>Repeat these steps for BAC and CBA, to get all the permutations.
- */
 public class PermuteString {
 
         public static String swapString(String a, int i, int j) {
@@ -2574,10 +2481,10 @@ public class Anagrams {
         String first = "deal";
         String second = "lead";
                 Anagrams nm = new Anagrams();
-        System.out.println(nm.approach2(first, second));  /* To activate methods for different approaches*/
-        System.out.println(nm.approach1(first, second));  /* To activate methods for different approaches*/
-        System.out.println(nm.approach3(first, second));  /* To activate methods for different approaches*/
-        System.out.println(nm.approach4(first, second));  /* To activate methods for different approaches*/
+        System.out.println(nm.approach2(first, second)); 
+        System.out.println(nm.approach1(first, second)); 
+        System.out.println(nm.approach3(first, second)); 
+        System.out.println(nm.approach4(first, second));  
 
         
     }
@@ -2589,7 +2496,7 @@ public class Anagrams {
             char c[] = s.toCharArray();
             char d[] = t.toCharArray();
             Arrays.sort(c);
-            Arrays.sort(d);    /* In this approach the strings are stored in the character arrays and both the arrays are sorted. After that both the arrays are compared for checking anangram */
+            Arrays.sort(d);    
             if (Arrays.equals(c, d)) {
                 return true;
             } else {
@@ -2761,34 +2668,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.HashSet;
 
-/*
-    **Problem Statement:**
-    A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s1 -> s2 -> ... -> sk such that:
 
-    Every adjacent pair of words differs by a single letter.
-    Every si for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
-    sk == endWord
-    Given two words, beginWord and endWord, and a dictionary wordList, return the number of words in the shortest transformation sequence from beginWord to endWord, or 0 if no such sequence exists.
-
-    **Example 1:**
-    Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
-    Output: 5 
-    Explanation: One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> cog", which is 5 words long.
-
-    **Example 2:**
-    Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
-    Output: 0
-    Explanation: The endWord "cog" is not in wordList, therefore there is no valid transformation sequence.
-
-    **Constraints:**
-    1 <= beginWord.length <= 10
-    endWord.length == beginWord.length
-    1 <= wordList.length <= 5000
-    wordList[i].length == beginWord.length
-    beginWord, endWord, and wordList[i] consist of lowercase English letters.
-    beginWord != endWord
-    All the words in wordList are unique.
- */
 class WordLadder {
 
     
@@ -2991,19 +2871,18 @@ public class Pangram {
     public static void main(String[] args) {
         assert isPangram("The quick brown fox jumps over the lazy dog");
         assert !isPangram("The quick brown fox jumps over the azy dog");
-        /* not exists l character */
+
     }
 
     
     public static boolean isPangram(String s) {
         boolean[] marked = new boolean[26];
-        /* by default all letters don't exists */
+      
         char[] values = s.toCharArray();
         for (char value : values) {
             if (Character.isLetter(value)) {
                 int index = Character.isUpperCase(value) ? value - 'A' : value - 'a';
                 marked[index] = true;
-                /* mark current character exists */
             }
         }
 
@@ -3853,10 +3732,6 @@ public class HexaDecimalToDecimal {
         hexa_Input = scan.nextLine();
 
                 dec_output = getHexaToDec(hexa_Input);
-        /*
-    Pass the string to the getHexaToDec function
-    and it returns the decimal form in the variable dec_output.
-         */
         System.out.println("Number in Decimal: " + dec_output);
         scan.close();
     }
@@ -4058,12 +3933,6 @@ package com.thealgorithms.backtracking;
 
 import java.util.Scanner;
 
-/*
- * Problem Statement :
- * Find the number of ways that a given integer, N , can be expressed as the sum of the Xth powers of unique, natural numbers.
- * For example, if N=100 and X=3, we have to find all combinations of unique cubes adding up to 100. The only solution is 1^3+2^3+3^3+4^3.
- * Therefore output will be 1.
- */
 public class PowerSum {
 
     public static void main(String[] args) {
@@ -4197,13 +4066,11 @@ public class FloodFill {
 
 		putPixel(image, x, y, newColor);
 
-		/* Recursively check for horizontally & vertically adjacent coordinates */
 		floodFill(image, x + 1, y, newColor, oldColor);
 		floodFill(image, x - 1, y, newColor, oldColor);
 		floodFill(image, x, y + 1, newColor, oldColor);
 		floodFill(image, x, y - 1, newColor, oldColor);
 
-		/* Recursively check for diagonally adjacent coordinates  */
 		floodFill(image, x + 1, y - 1, newColor, oldColor);
 		floodFill(image, x - 1, y + 1, newColor, oldColor);
 		floodFill(image, x + 1, y + 1, newColor, oldColor);
@@ -4215,27 +4082,6 @@ public class FloodFill {
 
 import java.util.*;
 
-/*
-    * Problem Statement: -
-    
-    Given a N*N board with the Knight placed on the first block of an empty board. Moving according to the rules of
-    chess knight must visit each square exactly once. Print the order of each cell in which they are visited.
-
-    Example: -
-
-    Input : N = 8
-
-    Output:
-        0  59  38  33  30  17   8  63
-        37  34  31  60   9  62  29  16
-        58   1  36  39  32  27  18   7
-        35  48  41  26  61  10  15  28
-        42  57   2  49  40  23   6  19
-        47  50  45  54  25  20  11  14
-        56  43  52   3  22  13  24   5
-        51  46  55  44  53   4  21  12
-
- */
 public class KnightsTour {
 
     private final static int base = 12;
@@ -4355,9 +4201,6 @@ public class GuassLegendre {
     }
 
     static double pi(int l) {
-        /*
-     * l: No of loops to run
-         */
 
         double a = 1, b = Math.pow(2, -0.5), t = 0.25, p = 1;
         for (int i = 0; i < l; ++i) {
@@ -4405,8 +4248,6 @@ public class RootPrecision {
 
                 int precision = (int) Math.pow(10, P);
         root = root * precision;
-        /*typecast it into integer then divide by precision and again typecast into double
-    so as to have decimal points upto P precision */
 
         rv = (int) root;
         return rv / precision;
@@ -4414,25 +4255,7 @@ public class RootPrecision {
 }
 package com.thealgorithms.others;
 
-/*
- * A left rotation operation on an array
- * shifts each of the array's elements
- * given integer n unit to the left.
- * 
- * @author sangin-lee 
- */
-
 public class ArrayLeftRotation {
-
-	/*
-	 * Returns the result of left rotation of given array arr and integer n
-	 * 
-	 * @param arr : int[] given array
-	 * 
-	 * @param n : int given integer
-	 * 
-	 * @return : int[] result of left rotation
-	 */
 	public static int[] rotateLeft(int[] arr, int n) {
 		int size = arr.length;
 		int[] dst = new int[size];
@@ -5327,22 +5150,6 @@ public class BankersAlgorithm {
     }
 }
 
-/*
-    Example: 
-    n = 5
-    m = 3
-
-    Process     Allocation      Max       Available
-                0   1   2    0   1   2    0   1   2
-
-        0       0   1   0    7   5   3    3   3   2
-        1       2   0   0    3   2   2 
-        2       3   0   2    9   0   2
-        3       2   1   1    2   2   2
-        4       0   0   2    4   3   3
-
-    Result: The system is in safe sequence and the sequence is as follows: P1, P3, P4, P0, P2 
- */
 package com.thealgorithms.others;
 
 import java.util.ArrayList;
@@ -5812,12 +5619,10 @@ class TwoPointers {
         int[] arr = {10, 20, 35, 50, 75, 80};
         int key = 70;
         assert isPairedSum(arr, key);
-        /* 20 + 60 == 70 */
 
         arr = new int[]{1, 2, 3, 4, 5, 6, 7};
         key = 13;
         assert isPairedSum(arr, key);
-        /* 6 + 7 == 13 */
 
         key = 14;
         assert !isPairedSum(arr, key);
@@ -5825,12 +5630,9 @@ class TwoPointers {
 
     
     private static boolean isPairedSum(int[] arr, int key) {
-        /* array sorting is necessary for this algorithm to function correctly */
         Arrays.sort(arr);
         int i = 0;
-        /* index of first element */
         int j = arr.length - 1;
-        /* index of last element */
 
         while (i < j) {
             if (arr[i] + arr[j] == key) {
@@ -6672,9 +6474,6 @@ package com.thealgorithms.others;
 
 import java.io.*;
 import java.util.*;
-
-/* display the most frequent K words in the file and the times it appear
-in the file – shown in order (ignore case and periods) */
 public class TopKWords {
 
     static class CountWords {
@@ -6793,12 +6592,6 @@ public class Luhn {
     }
 
 
-    /*
-        ========================
-         Business usage example
-        ========================
-     */
-    
     private record CreditCard(int[] digits) {
 
         private static final int DIGITS_COUNT = 16;
@@ -7566,7 +7359,6 @@ class NextFit extends MemoryManagementAlgorithms {
 
 package com.thealgorithms.others;
 
-/* Program to reverse a Stack using Recursion*/
 import java.util.Stack;
 
 public class ReverseStackUsingRecursion {
@@ -7595,7 +7387,6 @@ public class ReverseStackUsingRecursion {
         if (stack.isEmpty())         {
             return;
         }
-        /* All items are stored in call stack until we reach the end*/
 
         int temptop = stack.peek();
         stack.pop();
@@ -7605,7 +7396,6 @@ public class ReverseStackUsingRecursion {
         if (stack.isEmpty()) {
             stack.push(temptop);         } else {
             int temp = stack.peek();
-            /* All the items are stored in call stack until we reach end*/
             stack.pop();
 
             insertAtEnd(temptop); 
@@ -7913,10 +7703,7 @@ public class BFPRT {
         System.out.println(Arrays.toString(minK));
     }
 }
-/* this Code is the illustration of Boyer moore's voting algorithm to
-find the majority element is an array that appears more than n/2 times in an array
-where "n" is the length of the array.
-For more information on the algorithm refer https: */
+
 package com.thealgorithms.others;
 
 import java.util.*;
@@ -8459,20 +8246,10 @@ package com.thealgorithms.ciphers;
 
 import java.util.Scanner;
 
-/*
- * Java Implementation of Hill Cipher
- * Hill cipher is a polyalphabetic substitution cipher. Each letter is represented by a number belonging to the set Z26 where A=0 , B=1, ..... Z=25.
- * To encrypt a message, each block of n letters (since matrix size is n x n) is multiplied by an invertible n × n matrix, against modulus 26.
- * To decrypt the message, each block is multiplied by the inverse of the matrix used for encryption.
- * The cipher key and plaintext/ciphertext are user inputs.
- * @author Ojasva Jain
- */
 public class HillCipher {
 
     static Scanner userInput = new Scanner(System.in);
 
-    /* Following function encrypts the message
-     */
     static void encrypt(String message) {
         message = message.toUpperCase();
                 System.out.println("Enter key matrix size");
@@ -8685,12 +8462,6 @@ class ProductCipher {
 
 }
 package com.thealgorithms.ciphers;
-
-/*
- * Java program for Blowfish Algorithm 
- * Wikipedia: https: * 
- * Author: Akshay Dubey (https: * 
- * */
 
 public class Blowfish {
 	
@@ -8971,11 +8742,6 @@ public class Blowfish {
 		return ans.substring(ans.length() - 8);
 	}
 
-	/*F-function splits the 32-bit input into four 8-bit quarters 
-	 and uses the quarters as input to the S-boxes. 
-	 The S-boxes accept 8-bit input and produce 32-bit output. 
-	 The outputs are added modulo 232 and XORed to produce the final 32-bit output 
-	*/
 	private String f(String plainText)
 	{
 		String a[] = new String[4];
@@ -9061,9 +8827,7 @@ class AffineCipher {
     static String encryptMessage(char[] msg) {
                 String cipher = "";
         for (int i = 0; i < msg.length; i++) {
-                        /* applying encryption formula ( a x + b ) mod m
-            {here x is msg[i] and m is 26} and added 'A' to
-            bring it in range of ascii alphabet[ 65-90 | A-Z ] */
+                       
             if (msg[i] != ' ') {
                 cipher = cipher
                         + (char) ((((a * (msg[i] - 'A')) + b) % 26) + 'A');
@@ -9087,9 +8851,6 @@ class AffineCipher {
             }
         }
         for (int i = 0; i < cipher.length(); i++) {
-            /*Applying decryption formula a^-1 ( x - b ) mod m
-            {here x is cipher[i] and m is 26} and added 'A'
-            to bring it in range of ASCII alphabet[ 65-90 | A-Z ] */
             if (cipher.charAt(i) != ' ') {
                 msg = msg + (char) (((a_inv
                         * ((cipher.charAt(i) + 'A' - b)) % 26)) + 'A');
@@ -9941,7 +9702,7 @@ public final class ClosestPair {
                 }
             }
         }
-        yQuickSort(firstWindow, 0, secondCount - 1);         /* Coordinates in Window */
+        yQuickSort(firstWindow, 0, secondCount - 1);
         double length;
                 for (int i = 0; i < secondCount - 1; i++) {
             for (int j = (i + 1); j < secondCount; j++) {
@@ -10300,17 +10061,13 @@ public class PerfectNumber {
 
     public static void main(String[] args) {
         assert isPerfectNumber(6);
-        /* 1 + 2 + 3 == 6 */
         assert !isPerfectNumber(8);
-        /* 1 + 2 + 4 != 8 */
         assert isPerfectNumber(28);
-        /* 1 + 2 + 4 + 7 + 14 == 28 */
     }
 
     
     public static boolean isPerfectNumber(int number) {
         int sum = 0;
-        /* sum of its positive divisors */
         for (int i = 1; i < number; ++i) {
             if (number % i == 0) {
                 sum += i;
@@ -10385,11 +10142,7 @@ public class StandardScore {
 }
 package com.thealgorithms.maths;
 
-/* This is a program to check if a number is a Krishnamurthy number or not.
-A number is a Krishnamurthy number if the sum of the factorials of the digits of the number is equal to the number itself.
-For example, 1, 2 and 145 are Krishnamurthy numbers.
-Krishnamurthy number is also referred to as a Strong number.
- */
+
 import java.io.*;
 
 public class KrishnamurthyNumber {
@@ -10477,13 +10230,6 @@ public class PowerOfTwoOrNot {
 }
 package com.thealgorithms.maths;
 
-/*
- * Java program for Pronic Number
- * Pronic Number: A number n is a pronic number if
- * it is equal to product of two consecutive numbers m and m+1.
- * Wikipedia: https: * 
- * Author: Akshay Dubey (https: * 
- * */
 
 public class PronicNumber {
 
@@ -10575,7 +10321,6 @@ public class SumOfDigits {
     
     public static int sumOfDigits(int number) {
         number = number < 0 ? -number : number;
-        /* calculate abs value */
         int sum = 0;
         while (number != 0) {
             sum += number % 10;
@@ -10587,14 +10332,12 @@ public class SumOfDigits {
     
     public static int sumOfDigitsRecursion(int number) {
         number = number < 0 ? -number : number;
-        /* calculate abs value */
         return number < 10 ? number : number % 10 + sumOfDigitsRecursion(number / 10);
     }
 
     
     public static int sumOfDigitsFast(int number) {
         number = number < 0 ? -number : number;
-        /* calculate abs value */
         char[] digits = (number + "").toCharArray();
         int sum = 0;
         for (int i = 0; i < digits.length; ++i) {
@@ -10657,7 +10400,6 @@ public class ConvolutionFFT {
             ArrayList<FFT.Complex> a, ArrayList<FFT.Complex> b) {
         int convolvedSize = a.size() + b.size() - 1;         padding(a, convolvedSize);         padding(b, convolvedSize);
 
-        /* Find the FFTs of both signals (Note that the size of the FFTs will be bigger than the convolvedSize because of the extra zero padding in FFT algorithm) */
         FFT.fft(a, false);
         FFT.fft(b, false);
         ArrayList<FFT.Complex> convolved = new ArrayList<>();
@@ -10880,14 +10622,12 @@ public class FFT {
 
     
     public static ArrayList<Complex> fft(ArrayList<Complex> x, boolean inverse) {
-        /* Pad the signal with zeros if necessary */
         paddingPowerOfTwo(x);
         int N = x.size();
         int log2N = findLog2(N);
         x = fftBitReversal(N,log2N,x);
         int direction = inverse ? -1 : 1;
 
-        /* Main loop of the algorithm */
         for (int len = 2; len <= N; len *= 2) {
             double angle = -2 * Math.PI / len * direction;
             Complex wlen = new Complex(Math.cos(angle), Math.sin(angle));
@@ -10906,7 +10646,6 @@ public class FFT {
         return x;
     }
 
-    /* Find the log2(N) */
     public static int findLog2(int N){
         int log2N = 0;
         while ((1 << log2N) < N) {
@@ -10915,7 +10654,6 @@ public class FFT {
         return log2N;
     }
 
-    /* Swap the values of the signal with bit-reversal method */
     public static ArrayList<Complex> fftBitReversal(int N, int log2N, ArrayList<Complex> x){
         int reverse;
         for (int i = 0; i < N; i++) {
@@ -10927,7 +10665,6 @@ public class FFT {
         return x;
     }
 
-    /* Divide by N if we want the inverse FFT */
     public static ArrayList<Complex> inverseFFT(int N, boolean inverse, ArrayList<Complex> x ){
         if (inverse) {
             for (int i = 0; i < x.size(); i++) {
@@ -11118,30 +10855,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 
-/*
- * Find the mode of an array of numbers
- *
- * The mode of an array of numbers is the most frequently occurring number in the array,
- * or the most frequently occurring numbers if there are multiple numbers with the same frequency
- */
 public class Mode {
 
     public static void main(String[] args) {
 
-        /* Test array of integers */
         assert (mode(new int[]{})) == null;
         assert Arrays.equals(mode(new int[]{5}), new int[]{5});
         assert Arrays.equals(mode(new int[]{1, 2, 3, 4, 5}), new int[]{1, 2, 3, 4, 5});
         assert Arrays.equals(mode(new int[]{7, 9, 9, 4, 5, 6, 7, 7, 8}), new int[]{7});
         assert Arrays.equals(mode(new int[]{7, 9, 9, 4, 5, 6, 7, 7, 9}), new int[]{7, 9});
     }
-
-    /*
-   * Find the mode of an array of integers
-   *
-   * @param numbers array of integers
-   * @return mode of the array
-     */
     public static int[] mode(int[] numbers) {
 
         if (numbers.length == 0) {
@@ -11173,14 +10896,6 @@ public class Mode {
     }
 }
 package com.thealgorithms.maths;
-
-/*
- * Java program for Binomial Cofficients
- * Binomial Cofficients: A binomial cofficient C(n,k) gives number ways
- * in which k objects can be chosen from n objects.
- * Wikipedia: https: * 
- * Author: Akshay Dubey (https: * 
- * */
 
 public class BinomialCoefficient {
 	
@@ -11215,16 +10930,6 @@ public class Convolution {
     public static double[] convolution(double[] A, double[] B) {
         double[] convolved = new double[A.length + B.length - 1];
 
-        /*
-    The discrete convolution of two signals A and B is defined as:
-
-          A.length
-    C[i] = Σ (A[k]*B[i-k])
-          k=0
-
-    It's obvious that:  0 <= k <= A.length , 0 <= i <= A.length + B.length - 2  and  0 <= i-k <= B.length - 1
-    From the last inequality we get that:  i - B.length + 1 <= k <= i and thus we get the conditions below.
-         */
         for (int i = 0; i < convolved.length; i++) {
             convolved[i] = 0;
             int k = Math.max(i - B.length + 1, 0);
@@ -11318,15 +11023,12 @@ public class FindKthNumber {
     private static final Random random = new Random();
 
     public static void main(String[] args) {
-        /* generate array with random size and random elements */
         int[] nums = generateArray(100);
 
-        /* get 3th largest element */
         int kth = 3;
         int kthMaxIndex = nums.length - kth;
         int targetMax = findKthMax(nums, kthMaxIndex);
 
-        /* get 3th smallest element */
         int kthMinIndex = kth - 1;
         int targetMin = findKthMax(nums, kthMinIndex);
 
@@ -11529,7 +11231,6 @@ public class FFTBluestein {
         ArrayList<FFT.Complex> an = new ArrayList<>();
         ArrayList<FFT.Complex> bn = new ArrayList<>();
 
-        /* Initialization of the b(n) sequence (see Wikipedia's article above for the symbols used)*/
         for (int i = 0; i < bnSize; i++) {
             bn.add(new FFT.Complex());
         }
@@ -11540,7 +11241,6 @@ public class FFTBluestein {
             bn.set(bnSize - i - 1, new FFT.Complex(Math.cos(angle), Math.sin(angle)));
         }
 
-        /* Initialization of the a(n) sequence */
         for (int i = 0; i < N; i++) {
             double angle = -i * i * Math.PI / N * direction;
             an.add(x.get(i).multiply(new FFT.Complex(Math.cos(angle), Math.sin(angle))));
@@ -11548,14 +11248,12 @@ public class FFTBluestein {
 
         ArrayList<FFT.Complex> convolution = ConvolutionFFT.convolutionFFT(an, bn);
 
-        /* The final multiplication of the convolution with the b*(k) factor  */
         for (int i = 0; i < N; i++) {
             double angle = -1 * i * i * Math.PI / N * direction;
             FFT.Complex bk = new FFT.Complex(Math.cos(angle), Math.sin(angle));
             x.set(i, bk.multiply(convolution.get(i + N - 1)));
         }
 
-        /* Divide by N if we want the inverse FFT */
         if (inverse) {
             for (int i = 0; i < N; i++) {
                 FFT.Complex z = x.get(i);
@@ -11658,9 +11356,7 @@ public class MaxValue {
     public static void main(String[] args) {
         Random rand = new Random();
 
-        /* test 100 times using rand numbers */
         for (int i = 1; i <= 100; ++i) {
-            /* generate number from -50 to 49 */
             int a = rand.nextInt(100) - 50;
             int b = rand.nextInt(100) - 50;
             assert max(a, b) == Math.max(a, b);
@@ -11767,17 +11463,12 @@ public class AmicableNumber {
     public static void main(String[] args) {
 
         AmicableNumber.findAllInRange(1, 3000);
-        /* Res -> Int Range of 1 till 3000there are 3Amicable_numbers These are  1: = ( 220,284)	2: = ( 1184,1210)
-    3: = ( 2620,2924) So it worked	*/
 
     }
 
     
     static void findAllInRange(int startValue, int stopValue) {
 
-        /* the 2 for loops are to avoid to double check tuple. For example (200,100) and (100,200) is the same calculation
-     * also to avoid is to check the number with it self. a number with itself is always a AmicableNumber
-     * */
         StringBuilder res = new StringBuilder();
         int countofRes = 0;
 
@@ -11937,7 +11628,6 @@ import java.util.*;
 
 class NthUglyNumber {
 
-    /* Function to get the nth ugly number*/
     public long getNthUglyNo(int n) {
         long[] ugly = new long[n];
         int two = 0, three = 0, five = 0;
@@ -11982,11 +11672,8 @@ public class GCDRecursion {
 
     public static void main(String[] args) {
         System.out.println(gcd(20, 15));
-        /* output: 5 */
         System.out.println(gcd(10, 8));
-        /* output: 2 */
         System.out.println(gcd(gcd(10, 5), gcd(5, 10)));
-        /* output: 5 */
     }
 
     
@@ -12078,7 +11765,6 @@ public class CircularConvolutionFFT {
                 = Math.max(
                         a.size(), b.size());         padding(a, convolvedSize);         padding(b, convolvedSize);
 
-        /* Find the FFTs of both signal. Here we use the Bluestein algorithm because we want the FFT to have the same length with the signal and not bigger */
         FFTBluestein.fftBluestein(a, false);
         FFTBluestein.fftBluestein(b, false);
         ArrayList<FFT.Complex> convolved = new ArrayList<>();
@@ -12220,9 +11906,7 @@ public class MinValue {
     public static void main(String[] args) {
         Random rand = new Random();
 
-        /* test 100 times using rand numbers */
         for (int i = 1; i <= 100; ++i) {
-            /* generate number from -50 to 49 */
             int a = rand.nextInt(100) - 50;
             int b = rand.nextInt(100) - 50;
             assert min(a, b) == Math.min(a, b);
@@ -12412,39 +12096,28 @@ public class Area {
 
     public static void main(String[] args) {
 
-        /* test cube */
         assert Double.compare(surfaceAreaCube(1), 6.0) == 0;
 
-        /* test sphere */
         assert Double.compare(surfaceAreaSphere(5), 314.1592653589793) == 0;
         assert Double.compare(surfaceAreaSphere(1), 12.566370614359172) == 0;
 
-        /* test rectangle */
         assert Double.compare(surfaceAreaRectangle(10, 20), 200.0) == 0;
 
-        /* test square */
         assert Double.compare(surfaceAreaSquare(10), 100.0) == 0;
 
-        /* test triangle */
         assert Double.compare(surfaceAreaTriangle(10, 10), 50.0) == 0;
 
-        /* test parallelogram */
         assert Double.compare(surfaceAreaParallelogram(10, 20), 200.0) == 0;
 
-        /* test trapezium */
         assert Double.compare(surfaceAreaTrapezium(10, 20, 30), 450.0) == 0;
 
-        /* test circle */
         assert Double.compare(surfaceAreaCircle(20), 1256.6370614359173) == 0;
 
-        /* test cylinder */
         assert Double.compare(surfaceAreaCylinder(1, 2), 18.84955592153876) == 0;
 
-        /* test hemisphere */
         assert Double.compare(surfaceAreaHemisphere(5), 235.61944901923448) == 0;
         assert Double.compare(surfaceAreaHemisphere(1), 9.42477796076938) == 0;
 
-        /* test cone */
         assert Double.compare(surfaceAreaCone(6, 8), 301.59289474462014) == 0;
         assert Double.compare(surfaceAreaCone(10, 24), 1130.9733552923256) == 0;
 
@@ -12511,16 +12184,6 @@ import java.util.TreeMap;
 
 public class SimpsonIntegration {
 
-    /*
-     * Calculate definite integrals by using Composite Simpson's rule.
-     * Wiki: https:     * Given f a function and an even number N of intervals that divide the integration interval e.g. [a, b],
-     * we calculate the step h = (b-a)/N and create a table that contains all the x points of
-     * the real axis xi = x0 + i*h and the value f(xi) that corresponds to these xi.
-     *
-     * To evaluate the integral i use the formula below:
-     * I = h/3 * {f(x0) + 4*f(x1) + 2*f(x2) + 4*f(x3) + ... + 2*f(xN-2) + 4*f(xN-1) + f(xN)}
-     *
-     */
     public static void main(String[] args) {
         SimpsonIntegration integration = new SimpsonIntegration();
 
@@ -12538,16 +12201,6 @@ public class SimpsonIntegration {
         System.out.println("The integral is equal to: " + integralEvaluation);
     }
 
-    /*
-     * @param N: Number of intervals (must be even number N=2*k)
-     * @param h: Step h = (b-a)/N
-     * @param a: Starting point of the interval
-     * @param b: Ending point of the interval
-     *
-     * The interpolation points xi = x0 + i*h are stored the treeMap data
-     *
-     * @return result of the integral evaluation
-     */
     public double simpsonsMethod(int N, double h, double a) {
         TreeMap<Integer, Double> data = new TreeMap<>();         double temp;
         double xi = a; 
@@ -12583,7 +12236,6 @@ package com.thealgorithms.maths;
 
 public class FactorialRecursion {
 
-    /* Driver Code */
     public static void main(String[] args) {
         assert factorial(0) == 1;
         assert factorial(1) == 1;
@@ -12605,10 +12257,6 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class KaprekarNumbers {
-
-	/* This program demonstrates if a given number is Kaprekar Number or not.
-	Kaprekar Number: A Kaprekar number is an n-digit number which its square can be split into two parts where the right part has n
-	digits and sum of these parts is equal to the original number. */
 
 		public static ArrayList<Long> kaprekarNumberInRange(long start, long end) throws Exception {
 		long n = end-start;
@@ -12658,16 +12306,12 @@ public class SumOfArithmeticSeries {
 
     public static void main(String[] args) {
 
-        /* 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 */
         assert Double.compare(55.0, sumOfSeries(1, 1, 10)) == 0;
 
-        /* 1 + 3 + 5 + 7 + 9 + 11 + 13 + 15 + 17 + 19 */
         assert Double.compare(100.0, sumOfSeries(1, 2, 10)) == 0;
 
-        /* 1 + 11 + 21 + 31 + 41 + 51 + 61 + 71 + 81 + 91 */
         assert Double.compare(460.0, sumOfSeries(1, 10, 10)) == 0;
 
-        /* 0.1 + 0.2 + 0.3 + 0.4 + 0.5 + 0.6 + 0.7 + 0.8 + 0.9 + 1.0 */
         assert Double.compare(5.5, sumOfSeries(0.1, 0.1, 10)) == 0;
 
         assert Double.compare(49600.0, sumOfSeries(1, 10, 100)) == 0;
@@ -12682,8 +12326,6 @@ package com.thealgorithms.maths;
 
 import java.util.*;
 
-/*A magic square of order n is an arrangement of distinct n^2 integers,in a square, such that the n numbers in all
-rows, all columns, and both diagonals sum to the same constant. A magic square contains the integers from 1 to n^2.*/
 public class MagicSquare {
 
     public static void main(String[] args) {
@@ -12731,7 +12373,6 @@ package com.thealgorithms.maths;
 
 public class Factorial {
 
-    /* Driver Code */
     public static void main(String[] args) {
         assert factorial(0) == 1;
         assert factorial(1) == 1;
@@ -12919,11 +12560,9 @@ public class FindMinRecursion {
     public static void main(String[] args) {
         Random rand = new Random();
 
-        /* rand size */
         int size = rand.nextInt(100) + 1;
         int[] array = new int[size];
 
-        /* init array with rand numbers */
         for (int i = 0; i < size; i++) {
             array[i] = rand.nextInt() % 100;
         }
@@ -12997,11 +12636,9 @@ public class FindMax {
     public static void main(String[] args) {
         Random random = new Random();
 
-        /* random size */
         int size = random.nextInt(100) + 1;
         int[] array = new int[size];
 
-        /* init array with random numbers */
         for (int i = 0; i < size; i++) {
             array[i] = random.nextInt() % 100;
         }
@@ -13141,8 +12778,6 @@ public class RomanNumeralUtil {
 }
 package com.thealgorithms.maths;
 
-/*
- * Algorithm explanation: https: */
 public class GenericRoot {
 
     public static void main(String[] args) {
@@ -13225,7 +12860,7 @@ public final class LinearDiophantineEquationsSolver {
             return new GcdSolutionWrapper(a, new Solution(1, 0));
         }
                 final var stubWrapper = new GcdSolutionWrapper(0, new Solution(0, 0));
-        final var next = /* recursive call */ gcd(b, a % b, stubWrapper);
+        final var next = gcd(b, a % b, stubWrapper);
         previous.getSolution().setX(next.getSolution().getY());
         previous.getSolution().setY(next.getSolution().getX() - (a / b) * (next.getSolution().getY()));
         previous.setGcd(next.getGcd());
@@ -13395,33 +13030,24 @@ public class Median {
 package com.thealgorithms.maths;
 
 
-/* Find volume of various shapes.*/
 public class Volume {
 
     public static void main(String[] args) {
 
-        /* test cube */
         assert Double.compare(volumeCube(7), 343.0) == 0;
 
-        /* test cuboid */
         assert Double.compare(volumeCuboid(2, 5, 7), 70.0) == 0;
 
-        /* test sphere */
         assert Double.compare(volumeSphere(5), 523.5987755982989) == 0;
 
-        /* test cylinder */
         assert Double.compare(volumeCylinder(1, 2), 12.566370614359172) == 0;
 
-        /* test hemisphere */
         assert Double.compare(volumeHemisphere(5), 261.79938779914943) == 0;
 
-        /* test cone */
         assert Double.compare(volumeCone(5, 7), 916.297857297023) == 0;
         
-        /*test prism*/
         assert Double.compare(volumePrism(10, 2), 20.0) == 0;
         
-        /*test pyramid*/
         assert Double.compare(volumePyramid(10, 3), 10.0) == 0;
 
     }
@@ -13470,9 +13096,6 @@ package com.thealgorithms.maths;
 
 import java.util.*;
 
-/* 
-* @author Ojasva Jain
-* Determinant of Matrix Wikipedia link : https: */
 public class DeterminantOfMatrix {
 
             static int determinant(int a[][], int n) {
@@ -13527,11 +13150,9 @@ public class FindMin {
     public static void main(String[] args) {
         Random random = new Random();
 
-        /* random size */
         int size = random.nextInt(100) + 1;
         int[] array = new int[size];
 
-        /* init array with random numbers */
         for (int i = 0; i < size; i++) {
             array[i] = random.nextInt() % 100;
         }
@@ -13560,11 +13181,9 @@ public class FindMaxRecursion {
     public static void main(String[] args) {
         Random rand = new Random();
 
-        /* rand size */
         int size = rand.nextInt(100) + 1;
         int[] array = new int[size];
 
-        /* init array with rand numbers */
         for (int i = 0; i < size; i++) {
             array[i] = rand.nextInt() % 100;
         }
@@ -13594,11 +13213,6 @@ package com.thealgorithms.maths;
 import java.util.ArrayList;
 import java.util.List;
 
-/*
- * Java program for printing juggler sequence 
- * Wikipedia: https: * 
- * Author: Akshay Dubey (https: * 
- * */
 
 public class JugglerSequence {
     
@@ -13652,11 +13266,6 @@ package com.thealgorithms.maths;
 
 import java.util.Scanner;
 
-/*
- * Find the 2 elements which are non repeating in an array
- * Reason to use bitwise operator: It makes our program faster as we are operating on bits and not on
- * actual numbers.  
- */
 public class NonRepeatingElement {
 
     public static void main(String[] args) {
@@ -13699,22 +13308,6 @@ public class NonRepeatingElement {
         System.out.println("The two non repeating elements are " + num1 + " and " + num2);
 
     }
-
-    /* 
-  Explanation of the code:
-  let us assume we have an array [1,2,1,2,3,4]
-  Property of XOR: num ^ num = 0. 
-  If we XOR all the elemnets of the array we will be left with 3 ^ 4 as 1 ^ 1 and 2 ^ 2 would give 0.
-  Our task is to find num1 and num2 from the result of 3 ^ 4 = 7.
-  We need to find two's complement of 7 and find the rightmost set bit. i.e. (num & (-num))
-  Two's complement of 7 is 001 and hence res = 1.
-  There can be 2 options when we Bitise AND this res with all the elements in our array
-  1. Result will come non zero number
-  2. Result will be 0.
-  In the first case we will XOR our element with the first number (which is initially 0)
-  In the second case we will XOR our element with the second number(which is initially 0)
-  This is how we will get non repeating elements with the help of bitwise operators. 
-     */
 }
 package com.thealgorithms.maths;
 
@@ -14021,8 +13614,6 @@ public class RegexMatching {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/*
- * Algorithm explanation https: */
 public class LongestPalindromicSubstring {
 
     public static void main(String[] args) {
@@ -14185,16 +13776,6 @@ public class BoundaryFill {
 		
 		
 		boundaryFill(image,2,2,5,3);
-		
-		/* Output ==>
-		 * 0  0  0  0  0  0  0  
-		   0  3  3  3  3  0  0  
-		   0  3  5  5  3  0  0  
-           0  3  5  5  3  3  3  
-           0  3  3  3  5  5  3  
-           0  0  0  3  5  5  3  
-           0  0  0  3  3  3  3
-		 * */
 		
 				printImageArray(image);
 	}
@@ -14792,8 +14373,7 @@ public class MemoizationTechniqueKnapsack {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/* A Naive recursive implementation
-of 0-1 Knapsack problem */
+
 public class BruteForceKnapsack {
 
             static int max(int a, int b) {
@@ -14858,31 +14438,6 @@ public class CatalanNumber {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/*
-* this is an important Algo in which
-* we have starting and ending of board and we have to reach
-* we have to count no. of ways
-* that help to reach end point i.e number by rolling dice
-* which have 1 to 6 digits
-
-Test Case:
-here target is 10
-
-int n=10;
-		startAlgo();
-		System.out.println(bpR(0,n));
-		System.out.println(endAlgo()+"ms");
-		int[] strg=new int [n+1];
-		startAlgo();
-		System.out.println(bpRS(0,n,strg));
-		System.out.println(endAlgo()+"ms");
-		startAlgo();
-		System.out.println(bpIS(0,n,strg));
-		System.out.println(endAlgo()+"ms");
-
-
-
- */
 public class BoardPath {
 
     public static long startTime;
@@ -14950,13 +14505,9 @@ public class EditDistance {
         int len1 = word1.length();
         int len2 = word2.length();
                 int[][] dp = new int[len1 + 1][len2 + 1];
-        /* If second string is empty, the only option is to
-    insert all characters of first string into second*/
         for (int i = 0; i <= len1; i++) {
             dp[i][0] = i;
         }
-        /* If first string is empty, the only option is to
-    insert all characters of second string into first*/
         for (int j = 0; j <= len2; j++) {
             dp[0][j] = j;
         }
@@ -14967,8 +14518,7 @@ public class EditDistance {
                                 if (c1 == c2) {
                                         dp[i + 1][j + 1] = dp[i][j];
                 } else {
-                    /* if two characters are different ,
-          then take the minimum of the various operations(i.e insertion,removal,substitution)*/
+
                     int replace = dp[i][j] + 1;
                     int insert = dp[i][j + 1] + 1;
                     int delete = dp[i + 1][j] + 1;
@@ -14979,7 +14529,6 @@ public class EditDistance {
                 }
             }
         }
-        /* return the final answer , after traversing through both the strings*/
         return dp[len1][len2];
     }
 
@@ -15034,31 +14583,15 @@ public class EditDistance {
 }
 package com.thealgorithms.dynamicprogramming;
 
-
-/* The Naive approach is to find all the possible combinations of values from n dice and
-keep on counting the results that sum to X. This can be done using recursion. */
-
-/* Hence, storing the results of the solved sub-problems saves time.
-And it can be done using Dynamic Programming(DP).
-Following is implementation of Dynamic Programming approach. */
 class DP {
 
-    /* The main function that returns the number of ways to get sum 'x' with 'n' dice and 'm' with m faces. */
     public static long findWays(int m, int n, int x) {
 
-        /* Create a table to store the results of subproblems. 
-    One extra row and column are used for simplicity 
-    (Number of dice is directly used as row index and sum is directly used as column index). 
-    The entries in 0th row and 0th column are never used. */
         long[][] table = new long[n + 1][x + 1];
 
-        /* Table entries for only one dice */
         for (int j = 1; j <= m && j <= x; j++) {
             table[1][j] = 1;
         }
-
-        /* Fill rest of the entries in table using recursive relation 
-    i: number of dice, j: sum */
         for (int i = 2; i <= n; i++) {
             for (int j = 1; j <= x; j++) {
                 for (int k = 1; k < j && k <= m; k++) {
@@ -15078,15 +14611,6 @@ class DP {
         System.out.println(findWays(4, 3, 5));
     }
 }
-
-/*
-OUTPUT:
-0
-2
-21
-4
-6
- */
 
 package com.thealgorithms.dynamicprogramming;
 
@@ -15202,21 +14726,9 @@ public class WineProblem {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/*
-
- * Problem Statement: - 
- * Find Longest Alternating Subsequence
-
- * A sequence {x1, x2, .. xn} is alternating sequence if its elements satisfy one of the following relations : 
-
-   x1 < x2 > x3 < x4 > x5 < …. xn or 
-   x1 > x2 < x3 > x4 < x5 > …. xn
- */
 public class LongestAlternatingSubsequence {
 
-    /* Function to return longest alternating subsequence length*/
     static int AlternatingLength(int arr[], int n) {
-        /*
 
 		las[i][0] = Length of the longest
 			alternating subsequence ending at
@@ -15236,24 +14748,19 @@ public class LongestAlternatingSubsequence {
         }
 
         int result = 1; 
-        /* Compute values in bottom up manner */
         for (int i = 1; i < n; i++) {
 
-            /* Consider all elements as previous of arr[i]*/
             for (int j = 0; j < i; j++) {
 
-                /* If arr[i] is greater, then check with las[j][1] */
                 if (arr[j] < arr[i] && las[i][0] < las[j][1] + 1) {
                     las[i][0] = las[j][1] + 1;
                 }
 
-                /* If arr[i] is smaller, then check with las[j][0]*/
                 if (arr[j] > arr[i] && las[i][1] < las[j][0] + 1) {
                     las[i][1] = las[j][0] + 1;
                 }
             }
 
-            /* Pick maximum of both values at index i */
             if (result < Math.max(las[i][0], las[i][1])) {
                 result = Math.max(las[i][0], las[i][1]);
             }
@@ -15270,19 +14777,7 @@ public class LongestAlternatingSubsequence {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/*
-Input:  arr[] = {1, 6, 11, 5}
-Output: 1
-Explanation:
-Subset1 = {1, 5, 6}, sum of Subset1 = 12
-Subset2 = {11}, sum of Subset2 = 11
 
-Input:  arr[] = {36, 7, 46, 40}
-Output: 23
-Explanation:
-Subset1 = {7, 46} ;  sum of Subset1 = 53
-Subset2 = {36, 40} ; sum of Subset2  = 76
- */
 public class MinimumSumPartition {
 
     public static int subSet(int[] arr) {
@@ -15355,11 +14850,7 @@ public class PalindromicPartitioning {
 
     public static int minimalpartitions(String word) {
         int len = word.length();
-        /* We Make two arrays to create a bottom-up solution.
-           minCuts[i] = Minimum number of cuts needed for palindrome partitioning of substring word[0..i]
-           isPalindrome[i][j] = true if substring str[i..j] is palindrome
-           Base Condition: C[i] is 0 if P[0][i]= true
-         */
+
         int[] minCuts = new int[len];
         boolean[][] isPalindrome = new boolean[len][len];
 
@@ -15368,7 +14859,6 @@ public class PalindromicPartitioning {
             isPalindrome[i][i] = true;
         }
 
-        /* L is substring length. Build the solution in bottom up manner by considering all substrings of length starting from 2 to n. */
         for (L = 2; L <= len; L++) {
                         for (i = 0; i < len - L + 1; i++) {
                 j = i + L - 1;                                                                                 if (L == 2) {
@@ -15528,9 +15018,7 @@ public class SubsetSum {
     public static void main(String[] args) {
         int[] arr = new int[]{50, 4, 10, 15, 34};
         assert subsetSum(arr, 64);
-        /* 4 + 10 + 15 + 34 = 64 */
         assert subsetSum(arr, 99);
-        /* 50 + 15 + 34 = 99 */
         assert !subsetSum(arr, 5);
         assert !subsetSum(arr, 66);
     }
@@ -15592,30 +15080,6 @@ public class Sum_Of_Subset {
 }
 package com.thealgorithms.dynamicprogramming;
 
-/*
-Given the following grid with length m and width n:
-\---\---\---\ (n)
-\ 1 \ 3 \ 1 \
-\---\---\---\
-\ 1 \ 5 \ 1 \
-\---\---\---\
-\ 4 \ 2 \ 1 \
-\---\---\---\
-(m)
-Find the path where its sum is the smallest.
-
-All numbers given are positive.
-The Time Complexity of your algorithm should be smaller than or equal to O(mn).
-The Space Complexity of your algorithm should be smaller than or equal to O(mn).
-You can only move from the top left corner to the down right corner.
-You can only move one step down or right.
-
-EXAMPLE:
-INPUT: grid = [[1,3,1],[1,5,1],[4,2,1]]
-OUTPUT: 7
-EXPLANATIONS: 1 + 3 + 1 + 1 + 1 = 7
-
-For more information see https: */
 public class MinimumPathSum {
 
     public void testRegular() {
@@ -15865,12 +15329,10 @@ class InsertionSort implements SortAlgorithm {
         InsertionSort sort = new InsertionSort();
         sort.sort(integers);
         print(integers);
-        /* [1, 4, 6, 9, 12, 23, 54, 78, 231] */
 
         String[] strings = {"c", "a", "e", "b", "d"};
         sort.sort(strings);
         print(strings);
-        /* [a, b, c, d, e] */
     }
 }
 package com.thealgorithms.sorts;
@@ -15938,9 +15400,6 @@ import static com.thealgorithms.sorts.SortUtils.*;
 
 public class CircleSort implements SortAlgorithm {
 
-    /* This method implements the circle sort
-    * @param array The array to be sorted 
-     */
     @Override
     public <T extends Comparable<T>> T[] sort(T[] array) {
         int n = array.length;
@@ -15948,11 +15407,6 @@ public class CircleSort implements SortAlgorithm {
         return array;
     }
 
-    /* This method implements the cyclic sort recursive version
-    * @param array The array to be sorted
-    * @param the left boundary of the part currently being sorted
-    * @param the right boundary of the part currently being sorted
-     */
     private <T extends Comparable<T>> Boolean doSort(T[] array, int left, int right) {
         Boolean swapped = false;
 
@@ -15984,7 +15438,6 @@ public class CircleSort implements SortAlgorithm {
         return swapped || leftHalf || rightHalf;
     }
 
-    /* Driver code*/
     public static void main(String[] args) {
         CircleSort CSort = new CircleSort();
 
@@ -16171,7 +15624,6 @@ public class ShellSort implements SortAlgorithm {
         int length = array.length;
         int gap = 1;
 
-        /* Calculate gap for optimization purpose */
         while (gap < length / 3) {
             gap = 3 * gap + 1;
         }
@@ -16189,7 +15641,6 @@ public class ShellSort implements SortAlgorithm {
         return array;
     }
 
-    /* Driver Code */
     public static void main(String[] args) {
         Integer[] toSort = {4, 23, 6, 78, 1, 54, 231, 9, 12};
 
@@ -16640,10 +16091,7 @@ import java.util.*;
 import static com.thealgorithms.sorts.SortUtils.*;
 
 public class PigeonholeSort {
-    /*
-        This code implements the pigeonhole sort algorithm for the integer array,
-        but we can also implement this for string arrays too.
-        See https:    */
+
     void sort(Integer[] array){
         int maxElement = array[0];
         for (int element: array) {
@@ -16742,7 +16190,6 @@ public class BubbleSortRecursion implements SortAlgorithm {
         Integer[] array = new Integer[10];
 
         Random random = new Random();
-        /* generate 10 random numbers from -50 to 49 */
         for (int i = 0; i < array.length; ++i) {
             array[i] = random.nextInt(100) - 50;
         }
@@ -16750,7 +16197,6 @@ public class BubbleSortRecursion implements SortAlgorithm {
         BubbleSortRecursion bubbleSortRecursion = new BubbleSortRecursion();
         bubbleSortRecursion.sort(array);
 
-        /* check array is sorted or not */
         for (int i = 0; i < array.length - 1; ++i) {
             assert (array[i].compareTo(array[i + 1]) <= 0);
         }
@@ -16766,7 +16212,6 @@ public class BubbleSortRecursion implements SortAlgorithm {
     
     private static <T extends Comparable<T>> void bubbleSort(T[] unsorted, int len) {
         boolean swapped = false;
-        /* flag to check if array is sorted or not */
         for (int i = 0; i < len - 1; ++i) {
             if (SortUtils.greater(unsorted[i], unsorted[i + 1])) {
                 SortUtils.swap(unsorted, i, i + 1);
@@ -16933,8 +16378,6 @@ package com.thealgorithms.sorts;
 import java.util.Arrays;
 import java.util.*;
 
-/*This code implements the mergeSort algorithm without extra space
-For understanding about mergesort visit :https: */
 public class MergeSortNoExtraSpace {
 
     public static void call_merge_sort(int a[], int n) {
@@ -17014,7 +16457,6 @@ public class BucketSort {
     public static void main(String[] args) {
         int[] arr = new int[10];
 
-        /* generate 10 random numbers from -50 to 49 */
         Random random = new Random();
         for (int i = 0; i < arr.length; ++i) {
             arr[i] = random.nextInt(100) - 50;
@@ -17022,7 +16464,6 @@ public class BucketSort {
 
         bucketSort(arr);
 
-        /* check array is sorted or not */
         for (int i = 0, limit = arr.length - 1; i < limit; ++i) {
             assert arr[i] <= arr[i + 1];
         }
@@ -17030,34 +16471,27 @@ public class BucketSort {
 
     
     private static void bucketSort(int[] arr) {
-        /* get max value of arr */
         int max = max(arr);
 
-        /* get min value of arr */
         int min = min(arr);
 
-        /* number of buckets */
         int numberOfBuckets = max - min + 1;
 
         List<List<Integer>> buckets = new ArrayList<>(numberOfBuckets);
 
-        /* init buckets */
         for (int i = 0; i < numberOfBuckets; ++i) {
             buckets.add(new ArrayList<>());
         }
 
-        /* store elements to buckets */
         for (int value : arr) {
             int hash = hash(value, min, numberOfBuckets);
             buckets.get(hash).add(value);
         }
 
-        /* sort individual bucket */
         for (List<Integer> bucket : buckets) {
             Collections.sort(bucket);
         }
 
-        /* concatenate buckets to origin array */
         int index = 0;
         for (List<Integer> bucket : buckets) {
             for (int value : bucket) {
@@ -17567,7 +17001,6 @@ public class DNFSort {
         }
     }
 
-    /* Utility function to print array arr[] */
     static void printArray(int arr[], int arr_size) {
         for (int i = 0; i < arr_size; i++) {
             System.out.print(arr[i] + " ");
@@ -17575,7 +17008,6 @@ public class DNFSort {
         System.out.println("");
     }
 
-    /*Driver function to check for above functions*/
     public static void main(String[] args) {
         int arr[] = {0, 1, 1, 0, 1, 2, 1, 2, 0, 0, 0, 1};
         int arr_size = arr.length;
@@ -17586,14 +17018,8 @@ public class DNFSort {
 }
 package com.thealgorithms.sorts;
 
-/* Java program for Bitonic Sort. Note that this program
-works only when size of input is a power of 2. */
 public class BitonicSort {
 
-    /* The parameter dir indicates the sorting direction,
-  ASCENDING or DESCENDING; if (a[i] > a[j]) agrees
-  with the direction, then a[i] and a[j] are
-  interchanged. */
     void compAndSwap(int a[], int i, int j, int dir) {
         if ((a[i] > a[j] && dir == 1) || (a[i] < a[j] && dir == 0)) {
                         int temp = a[i];
@@ -17602,11 +17028,7 @@ public class BitonicSort {
         }
     }
 
-    /* It recursively sorts a bitonic sequence in ascending
-  order, if dir = 1, and in descending order otherwise
-  (means dir=0). The sequence to be sorted starts at
-  index position low, the parameter cnt is the number
-  of elements to be sorted.*/
+
     void bitonicMerge(int a[], int low, int cnt, int dir) {
         if (cnt > 1) {
             int k = cnt / 2;
@@ -17618,10 +17040,7 @@ public class BitonicSort {
         }
     }
 
-    /* This funcion first produces a bitonic sequence by
-  recursively sorting its two halves in opposite sorting
-  orders, and then calls bitonicMerge to make them in
-  the same order */
+
     void bitonicSort(int a[], int low, int cnt, int dir) {
         if (cnt > 1) {
             int k = cnt / 2;
@@ -17634,13 +17053,10 @@ public class BitonicSort {
         }
     }
 
-    /*Caller of bitonicSort for sorting the entire array
-  of length N in ASCENDING order */
     void sort(int a[], int N, int up) {
         bitonicSort(a, 0, N, up);
     }
 
-    /* A utility function to print array of size n */
     static void printArray(int arr[]) {
         int n = arr.length;
         for (int i = 0; i < n; ++i) {
@@ -17953,7 +17369,6 @@ class BubbleSort implements SortAlgorithm {
             assert integers[i] <= integers[i + 1];
         }
         print(integers);
-        /* output: [1, 4, 6, 9, 12, 23, 54, 78, 231] */
 
         String[] strings = {"c", "a", "e", "b", "d"};
         bubbleSort.sort(strings);
@@ -17961,7 +17376,6 @@ class BubbleSort implements SortAlgorithm {
             assert strings[i].compareTo(strings[i + 1]) <= 0;
         }
         print(bubbleSort.sort(strings));
-        /* output: [a, b, c, d, e] */
     }
 }
 package com.thealgorithms.sorts;
