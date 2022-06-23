@@ -602,8 +602,7 @@ struct Sparse_table {
 }  }  
 
 static void test() {
-    /* We take an array as an input on which we need to perform the ranged
-     * minimum queries[RMQ](https:     */
+
     std::array<int64_t, 10> testcase = {
         1, 2, 3, 4, 5,
         6, 7, 8, 9, 10};      size_t testcase_size =
@@ -736,8 +735,6 @@ class trie {
                 return true;
             }
         }
-
-        /* should not return here */
         std::cout << __func__ << ":" << __LINE__
                   << "Should not reach this line\n";
         return false;
@@ -1216,12 +1213,7 @@ namespace list_array {
             }
                         return -1;
         }
-
-        /*
-         * @brief Parent function of binarySearch and linearSearch methods
-         * @param val element that will be searched
-         * @return index of element in the list if present else -1
-         */
+	
         uint64_t search(const uint64_t &val) {
             uint64_t pos;                         if (isSorted) {
                 pos = BinarySearch(data, 0, top - 1, val);
@@ -1386,16 +1378,7 @@ int main() {
     }
     return 0;
 }
-/*
- * This program reads a data file consisting of students' GPAs
- * followed by their names. The program then prints the highest
- * GPA and the names of the students with the highest GPA.
- * It uses stack to store the names of the students
- * Run:
- *     make all
- *     ./main student.txt
- ************************************************************
- * */
+
 #include <cassert>
 #include <fstream>
 #include <iomanip>
@@ -2070,7 +2053,6 @@ class SkipList {
                 }
                 update[i]->forward[i] = x->forward[i];
             }
-            /* Remove empty levels*/
             while (level > 0 && header->forward[level] == nullptr) level--;
             std::cout << "Deleted" << std::endl;
         } else {
@@ -2648,9 +2630,7 @@ static void test() {
 int main() {
     test();      return 0;
 }
-/*
-    Write a program to implement Queue using linkedlist.
-*/
+
 #include <iostream>
 
 struct linkedlist {
@@ -3173,8 +3153,6 @@ int32_t list::traverse(int index) {
         current = current->next;
     }
 
-    /* if we get to this line,the caller was asking for a non-existent element
-    so we assert fail */
     exit(1);
 }
 
@@ -4720,7 +4698,6 @@ class dsu {
 };
 
 static void test1() {
-    /* checks the parents in the resultant structures */
     uint64_t n = 10;       dsu d(n + 1);          d.unionSet(2, 1);      d.unionSet(1, 4);
     d.unionSet(8, 1);
     d.unionSet(3, 5);
@@ -5164,15 +5141,13 @@ void RBtree::display(node *p)
 			cout << "\n\nLeft:\n";
 			display(p->left);
 		}
-		/*else
-		 cout<<"\nNo Left Child.\n";*/
+		
 		if (p->right)
 		{
 			cout << "\n\nRight:\n";
 			display(p->right);
 		}
-		/*else
-		 cout<<"\nNo Right Child.\n"*/
+		
 	}
 }
 void RBtree::search()
@@ -6353,8 +6328,7 @@ public:
   
   explicit Tree(int nodes)
       : t_nodes(nodes), t_maxlift(static_cast<int>(floor(log2(nodes))) + 1) {
-    /* Initialize and resize all the vectors */
-    t_root = 0; /* Default */
+    t_root = 0; 
     t_adj.resize(t_nodes);
     t_par.assign(t_nodes, std::vector<int>(t_maxlift, -1));
     t_depth.assign(t_nodes, 0);
@@ -6535,7 +6509,6 @@ private:
 public:
   
   explicit HLD<X>(int nodes) : Tree<X>(nodes), SG<X>(nodes) {
-    /* Initialization and resize vectors */
     label = 0;
     h_label.assign(Tree<X>::t_nodes, -1);
     h_heavychlid.assign(Tree<X>::t_nodes, -1);
@@ -8149,7 +8122,6 @@ std::vector<float> predict_OLS_regressor(std::vector<std::vector<T>> const &X,
 void ols_test() {
     int F = 3, N = 5;
 
-    /* test function = x^2 -5 */
     std::cout << "Test 1 (quadratic function)....";
         std::vector<std::vector<float>> data1(
         {{-5, 25, -125}, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1}, {6, 36, 216}});
@@ -8164,7 +8136,6 @@ void ols_test() {
     }
     std::cout << "passed\n";
 
-    /* test function = x^3 + x^2 - 100 */
     std::cout << "Test 2 (cubic function)....";
         std::vector<std::vector<float>> data2(
         {{-5, 25, -125}, {-1, 1, -1}, {0, 0, 0}, {1, 1, 1}, {6, 36, 216}});
@@ -8362,11 +8333,7 @@ double update_weights(const std::valarray<double> &X,
 #endif
     for (x = from_x; x < to_x; x++) {
         for (y = from_y; y < to_y; y++) {
-            /* you can enable the following normalization if needed.
-   personally, I found it detrimental to convergence */
-                        
-            /* apply scaling inversely proportional to distance from the
-               current node */
+
             double d2 =
                 (d_min_x - x) * (d_min_x - x) + (d_min_y - y) * (d_min_y - y);
             double scale_factor = std::exp(-d2 / (2.f * alpha * alpha));
@@ -8435,10 +8402,6 @@ void test_2d_classes(std::vector<std::valarray<double>> *data) {
                 data[0][i][0] = _random(centres[cls][0] - R, centres[cls][0] + R);
         data[0][i][1] = _random(centres[cls][1] - R, centres[cls][1] + R);
 
-        /* The follosing can also be used
-        for (int j = 0; j < 2; j++)
-            data[i][j] = _random(centres[class][j] - R, centres[class][j] + R);
-        */
     }
 }
 
@@ -8485,10 +8448,7 @@ void test_3d_classes1(std::vector<std::valarray<double>> *data) {
         data[0][i][1] = _random(centres[cls][1] - R, centres[cls][1] + R);
         data[0][i][2] = _random(centres[cls][2] - R, centres[cls][2] + R);
 
-        /* The follosing can also be used
-        for (int j = 0; j < 3; j++)
-            data[i][j] = _random(centres[class][j] - R, centres[class][j] + R);
-        */
+       
     }
 }
 
@@ -8535,10 +8495,6 @@ void test_3d_classes2(std::vector<std::valarray<double>> *data) {
         data[0][i][1] = _random(centres[cls][1] - R, centres[cls][1] + R);
         data[0][i][2] = _random(centres[cls][2] - R, centres[cls][2] + R);
 
-        /* The follosing can also be used
-        for (int j = 0; j < 3; j++)
-            data[i][j] = _random(centres[class][j] - R, centres[class][j] + R);
-        */
     }
 }
 
@@ -8795,10 +8751,6 @@ void test_3d_classes(std::vector<std::valarray<double>> *data) {
         data[0][i][1] = _random(centres[cls][1] - R, centres[cls][1] + R);
         data[0][i][2] = _random(centres[cls][2] - R, centres[cls][2] + R);
 
-        /* The follosing can also be used
-        for (int j = 0; j < 3; j++)
-            data[0][i][j] = _random(centres[cls][j] - R, centres[cls][j] + R);
-        */
     }
 }
 
@@ -8930,11 +8882,9 @@ class adaline {
             return 0;
         }
 
-        /* output of the model with current weights */
         int p = predict(x);
         int prediction_error = y - p;          double correction_factor = eta * prediction_error;
 
-        /* update each weight, the last weight is the bias term */
         for (int i = 0; i < x.size(); i++) {
             weights[i] += correction_factor * x[i];
         }
@@ -9333,10 +9283,7 @@ class AyStarSearch {
         std::shared_ptr<Info> FinalState,
         const MapOfPuzzleInfoWithPuzzleInfo &parent_of) {
                 auto current_state = FinalState;
-        /*
-         * For storing the solution tree starting from initial state to
-         * final state
-         */
+      
         std::vector<Puzzle> answer;
         while (current_state != nullptr) {
             answer.emplace_back(*current_state->state);
@@ -9431,9 +9378,6 @@ static void test() {
     ideal[1] = row3({4, 5, 6});
     ideal[2] = row3({7, 8, 0});
 
-    /*
-     * Heuristic function: Manhattan distance
-     */
     auto manhattan_distance =
         [](const machine_learning::aystar_search::EightPuzzle<> &first,
            const machine_learning::aystar_search::EightPuzzle<> &second) {
@@ -10170,7 +10114,6 @@ std::complex<double> *InverseFastFourierTransform(std::complex<double> *p,
 }  
 
 static void test() {
-    /* descriptions of the following test */
 
     auto *t1 = new std::complex<double>[2];      auto *t2 = new std::complex<double>[4];  
     t1[0] = {3, 0};
@@ -10380,7 +10323,6 @@ double midpoint_euler(double dx, double x0, double x_max,
 
     std::size_t L = y->size();
 
-    /* start integration */
     std::clock_t t1 = std::clock();
     double x = x0;
     do {          if (save_to_file && fp.is_open()) {
@@ -10391,7 +10333,7 @@ double midpoint_euler(double dx, double x0, double x_max,
             fp << y[0][L - 1] << "\n";
         }
 
-        midpoint_euler_step(dx, x, y, &dy);          x += dx;                                 } while (x <= x_max);      /* end of integration */
+        midpoint_euler_step(dx, x, y, &dy);          x += dx;                                 } while (x <= x_max);     
     std::clock_t t2 = std::clock();
 
     if (fp.is_open())
@@ -10438,9 +10380,9 @@ void save_exact_solution(const double &X0, const double &X_MAX,
 
 
 int main(int argc, char *argv[]) {
-    double X0 = 0.f;                       /* initial value of x0 */
-    double X_MAX = 10.F;                   /* upper limit of integration */
-    std::valarray<double> Y0 = {1.f, 0.f}; /* initial value Y = y(x = x_0) */
+    double X0 = 0.f;                       
+    double X_MAX = 10.F;                   
+    std::valarray<double> Y0 = {1.f, 0.f}; 
     double step_size;
 
     if (argc == 1) {
@@ -10453,7 +10395,6 @@ int main(int argc, char *argv[]) {
         double total_time = midpoint_euler(step_size, X0, X_MAX, &Y0, true);
     std::cout << "\tTime = " << total_time << " ms\n";
 
-    /* compute exact solution for comparion */
     save_exact_solution(X0, X_MAX, step_size, Y0);
 
     return 0;
@@ -10582,7 +10523,6 @@ double babylonian_method(double radicand) {
 }  
 
 static void test() {
-    /* descriptions of the following test */
 
     auto testcase1 = 125348;      auto testcase2 = 752080;  
     auto real_output1 = 354.045194855;      auto real_output2 = 867.225460881;  
@@ -10633,11 +10573,9 @@ void test1() {
     int mat_size = 3;      const int range = 50;
     const int range2 = range >> 1;
 
-    /* Create a square matrix with random values */
     matrix<double> A(mat_size, std::valarray<double>(mat_size));
     matrix<double> L(mat_size, std::valarray<double>(mat_size));      matrix<double> U(mat_size, std::valarray<double>(mat_size));      for (int i = 0; i < mat_size; i++) {
                 for (int j = 0; j < mat_size; j++)
-            /* create random values in the limits [-range2, range-1] */
             A[i][j] = static_cast<double>(std::rand() % range - range2);
     }
 
@@ -10888,7 +10826,6 @@ double semi_implicit_euler(double dx, double x0, double x_max,
 
     std::size_t L = y->size();
 
-    /* start integration */
     std::clock_t t1 = std::clock();
     double x = x0;
     do {          if (save_to_file && fp.is_open()) {
@@ -10899,7 +10836,7 @@ double semi_implicit_euler(double dx, double x0, double x_max,
             fp << y[0][L - 1] << "\n";
         }
 
-        semi_implicit_euler_step(dx, x, y, &dy);          x += dx;                                      } while (x <= x_max);      /* end of integration */
+        semi_implicit_euler_step(dx, x, y, &dy);          x += dx;                                      } while (x <= x_max);
     std::clock_t t2 = std::clock();
 
     if (fp.is_open())
@@ -10946,9 +10883,9 @@ void save_exact_solution(const double &X0, const double &X_MAX,
 
 
 int main(int argc, char *argv[]) {
-    double X0 = 0.f;                       /* initial value of x0 */
-    double X_MAX = 10.F;                   /* upper limit of integration */
-    std::valarray<double> Y0 = {1.f, 0.f}; /* initial value Y = y(x = x_0) */
+    double X0 = 0.f;
+    double X_MAX = 10.F;
+    std::valarray<double> Y0 = {1.f, 0.f};
     double step_size;
 
     if (argc == 1) {
@@ -10961,7 +10898,6 @@ int main(int argc, char *argv[]) {
         double total_time = semi_implicit_euler(step_size, X0, X_MAX, &Y0, true);
     std::cout << "\tTime = " << total_time << " ms\n";
 
-    /* compute exact solution for comparion */
     save_exact_solution(X0, X_MAX, step_size, Y0);
 
     return 0;
@@ -11008,7 +10944,6 @@ double forward_euler(double dx, double x0, double x_max,
 
     std::size_t L = y->size();
 
-    /* start integration */
     std::clock_t t1 = std::clock();
     double x = x0;
 
@@ -11018,7 +10953,7 @@ double forward_euler(double dx, double x0, double x_max,
                 fp << y[0][i] << ",";              }
             fp << y[0][L - 1] << "\n";          }
 
-        forward_euler_step(dx, x, y, &dy);          x += dx;                                } while (x <= x_max);      /* end of integration */
+        forward_euler_step(dx, x, y, &dy);          x += dx;                                } while (x <= x_max);      
     std::clock_t t2 = std::clock();
 
     if (fp.is_open()) {
@@ -11064,9 +10999,9 @@ void save_exact_solution(const double &X0, const double &X_MAX,
 
 
 int main(int argc, char *argv[]) {
-    double X0 = 0.f;                    /* initial value of x0 */
-    double X_MAX = 10.F;                /* upper limit of integration */
-    std::valarray<double> Y0{1.f, 0.f}; /* initial value Y = y(x = x_0) */
+    double X0 = 0.f;
+    double X_MAX = 10.F;
+    std::valarray<double> Y0{1.f, 0.f};
     double step_size = NAN;
 
     if (argc == 1) {
@@ -11079,7 +11014,6 @@ int main(int argc, char *argv[]) {
         double total_time = forward_euler(step_size, X0, X_MAX, &Y0, true);
     std::cout << "\tTime = " << total_time << " ms\n";
 
-    /* compute exact solution for comparion */
     save_exact_solution(X0, X_MAX, step_size, Y0);
 
     return 0;
@@ -11146,9 +11080,7 @@ std::pair<uint32_t, double> durand_kerner_algo(
     std::ofstream log_file;
 
     if (write_log) {
-        /*
-         * store intermediate values to a CSV file
-         */
+
         log_file.open("durand_kerner.log.csv");
         if (!log_file.is_open()) {
             perror("Unable to create a storage log file!");
@@ -11236,7 +11168,6 @@ void test1() {
         std::complex<double>(0., 2.),
         std::complex<double>(0., -2.)      };
 
-    /* initialize root approximations with random values */
     for (int n = 0; n < roots.size(); n++) {
         roots[n] = std::complex<double>(std::rand() % 100, std::rand() % 100);
         roots[n] -= 50.f;
@@ -11265,7 +11196,6 @@ void test2() {
         std::complex<double>(4., 0.), std::complex<double>(-2., 3.46410162),
         std::complex<double>(-2., -3.46410162)      };
 
-    /* initialize root approximations with random values */
     for (int n = 0; n < roots.size(); n++) {
         roots[n] = std::complex<double>(std::rand() % 100, std::rand() % 100);
         roots[n] -= 50.f;
@@ -11288,7 +11218,6 @@ void test2() {
 
 
 int main(int argc, char **argv) {
-    /* initialize random seed: */
     std::srand(std::time(nullptr));
 
     if (argc < 2) {
@@ -11310,7 +11239,6 @@ int main(int argc, char **argv) {
             std::cout << "(" << coeffs[n] << ") x^" << degree - n - 1
                       << " = 0\n";
 
-        /* initialize root approximations with random values */
         if (n < degree - 1) {
             s0[n] = std::complex<double>(std::rand() % 100, std::rand() % 100);
             s0[n] -= 50.f;
@@ -11475,7 +11403,6 @@ std::complex<double> *FastFourierTransform(std::complex<double> *p, uint8_t n) {
 }  
 
 static void test() {
-    /* descriptions of the following test */
 
     auto *t1 = new std::complex<double>[2];      auto *t2 = new std::complex<double>[4];  
     t1[0] = {1, 0};
@@ -11769,21 +11696,18 @@ std::valarray<double> eigen_values(std::valarray<std::valarray<double>> *A,
     std::valarray<std::valarray<double>> Q(rows);
     std::valarray<std::valarray<double>> R(columns);
 
-    /* number of eigen values = matrix size */
     std::valarray<double> eigen_vals(rows);
     for (int i = 0; i < rows; i++) {
         Q[i] = std::valarray<double>(columns);
         R[i] = std::valarray<double>(columns);
     }
 
-    /* continue till all eigen values are found */
     while (num_eigs > 0) {
-        /* iterate with QR decomposition */
         while (std::abs(A[0][num_eigs][num_eigs - 1]) >
                std::numeric_limits<double>::epsilon()) {
                         last_eig = A[0][num_eigs][num_eigs];
             for (int i = 0; i < rows; i++) {
-                A[0][i][i] -= last_eig; /* A - cI */
+                A[0][i][i] -= last_eig;
             }
 
             qr_decompose(*A, &Q, &R);
@@ -11799,11 +11723,10 @@ std::valarray<double> eigen_values(std::valarray<std::valarray<double>> *A,
                         mat_mul(R, Q, A);
 
             for (int i = 0; i < rows; i++) {
-                A[0][i][i] += last_eig; /* A + cI */
+                A[0][i][i] += last_eig;
             }
         }
 
-        /* store the converged eigen value */
         eigen_vals[num_eigs] = last_eig;
                 if (print_intermediates) {
             std::cout << "========================\n";
@@ -11902,7 +11825,6 @@ int main(int argc, char **argv) {
         A[i] = std::valarray<double>(columns);
     }
 
-    /* create a random matrix */
     create_matrix(&A);
 
     std::cout << A << "\n";
@@ -12009,19 +11931,7 @@ int main() {
     }
     return 0;
 }
-/*
- * @brief [Magic sequence](https: * implementation
- *
- * @details Solve the magic sequence problem with backtracking
- *
- * "A magic sequence of length $n$ is a sequence of integers $x_0
- * \ldots x_{n-1}$ between $0$ and $n-1$, such that for all $i$
- * in $0$ to $n-1$, the number $i$ occurs exactly $x_i$ times in
- * the sequence. For instance, $6,2,1,0,0,0,1,0,0,0$ is a magic
- * sequence since $0$ occurs $6$ times in it, $1$ occurs twice, etc."
- * Quote taken from the [CSPLib](https: * website
- *
- * @author [Jxtopher](https: */
+
 
 #include <algorithm>  #include <cassert>    #include <iostream>   #include <list>       #include <numeric>    #include <vector>     
 
@@ -13235,9 +13145,7 @@ int main() {
 
     return 0;
 }
-/* Implementation of Kosaraju's Algorithm to find out the strongly connected
-   components (SCCs) in a graph. Author:Anirban166
-*/
+
 
 #include <iostream>
 #include <stack>
@@ -13521,12 +13429,7 @@ static void test() {
 int main() {
     test();      return 0;
 }
-/*
- * Author: Amit Kumar
- * Created: May 24, 2020
- * Copyright: 2020, Open-Source
- * Last Modified: May 25, 2020
- */
+
 #include <algorithm>
 #include <bitset>
 #include <cstring>
@@ -13622,15 +13525,7 @@ class Graph {
     }
 };
 int main() {
-    /*
-       Input Graph: (for testing )
-        4 5 0 3
-        0 1 10
-        1 2 1
-        1 3 1
-        0 2 1
-        2 3 10
-     */
+
     Graph graph;
     graph.set_graph();
     graph.ford_fulkerson();
@@ -13895,13 +13790,7 @@ namespace graph {
 namespace depth_first_search {
 
 void addEdge(std::vector<std::vector<size_t>> *adj, size_t u, size_t v) {
-	/*
-	*
-	* Here we are considering undirected graph that's the
-	* reason we are adding v to the adjacency list representation of u
-	* and also adding u to the adjacency list representation of v
-	*
-	*/
+
 	(*adj)[u - 1].push_back(v - 1);
 }
 
@@ -14078,13 +13967,7 @@ int main() {
 namespace graph {
 
 void addEdge(std::vector<std::vector<size_t>> *adj, size_t u, size_t v) {
-    /*
-     *
-     * Here we are considering undirected graph that's the
-     * reason we are adding v to the adjacency list representation of u
-     * and also adding u to the adjacency list representation of v
-     *
-     */
+
     (*adj)[u - 1].push_back(v - 1);
     (*adj)[v - 1].push_back(u - 1);
 }
@@ -14133,12 +14016,7 @@ int main() {
     std::cout << std::endl;
     return 0;
 }
-/*
- *  Copyright : 2020 , MIT
- *  Author : Amit Kumar (offamitkumar)
- *  Last Modified Date: May 24, 2020
- *
- */
+
 #include <algorithm>  #include <iostream>   #include <vector>     
 class Solution {
     std::vector<std::vector<int>> graph;
@@ -14190,19 +14068,7 @@ int main() {
     node.push_back({1, 3});
     node.push_back({1, 2});
     node.push_back({2, 4});
-    /*
-     *     0 <--> 1 <---> 2
-     *            ^       ^
-     *            |       |
-     *            |       |
-     *            \/     \/
-     *            3       4
-     *
-     *    In this graph there are 4 bridges [0,2] , [2,4] , [3,5] , [1,2]
-     *
-     *    I assumed that the graph is bi-directional and connected.
-     *
-     */
+
     std::vector<std::vector<int>> bridges =
         s1.search_bridges(number_of_node, node);
     std::cout << bridges.size() << " bridges found!\n";
@@ -14420,7 +14286,6 @@ class LowestCommonAncestor {
         return up[u][0];
     }
 
-    /* \brief reference to the rooted tree this structure allows to query */
     const RootedTree &tree;
     
     std::vector<std::vector<int> > up;
@@ -14750,7 +14615,6 @@ int main() {
 
 
 namespace graph {
-/* Class Graph definition */
 template <typename T>
 class Graph {
     
@@ -14792,7 +14656,6 @@ class Graph {
         return visited;
     }
 };
-/* Class definition ends */
 }  
 
 static void tests() {
@@ -14953,27 +14816,10 @@ int main() {
 
     return 0;
 }
-/*
- * @file
- * @brief Determines the [Date of
- * Easter](https: *
- * @details
- * The date of Easter is determined in each year through a calculation known as
- * "computus." Easter is celebrated on the first Sunday after the Paschal full
- * moon, which is the first full moon on or after 21 March. Determining this
- * date in advance requires a correlation between the lunar months and the solar
- * year, while also accounting for the month, date, and weekday of the Julian or
- * Gregorian calendar. The complexity of the algorithm arises because of the
- * desire to associate the date of Easter with the date of the Jewish feast of
- * Passover which, Christians believe, is when Jesus was crucified.
- *
- *
- * @author [AlternateWalls](https: */
+
 
 #include <cassert>   #include <iostream>  
-/*
- * @brief Contains information for Easter date
- */
+
 class EasterYearMonthDay {
  public:
     uint64_t year;       uint64_t month;      uint64_t day;    
@@ -14983,13 +14829,7 @@ class EasterYearMonthDay {
     }
 };
 
-/*
- * @brief Function that finds the month and day of Easter
- * @params param1 An int "y" of the year you want to find Easter on after
- * 1582
- * @returns An instance of the easterYearMonthDay calss that contains the
- * information (Ex. 420 - 4/20 or April 20th)
- */
+
 EasterYearMonthDay findEaster(uint64_t y) {
     if (y > 1582) {
         uint64_t a = y % 19;           uint64_t b = y / 100;          uint64_t c = y % 100;
@@ -15292,13 +15132,7 @@ Node *BT::createNewNode(uint64_t data) {
     return node;
 }
 
-/*
- * @brief inorder() function that will perform the inorder traversal
- * recursively, and return the resultant vector that contain the inorder
- * traversal of a tree.
- * @param root head/root node of a tree
- * @return result that is containing the inorder traversal of a tree
- **/
+
 std::vector<uint64_t> BT::inorder(Node *root) {
     if (root == nullptr) {          return {};
     }
@@ -15706,7 +15540,6 @@ double circle(const std::vector<Point> &P) {
     Point C;
     Point minC;
 
-    /* This code is invalid and does not give correct result for TEST 3 */
         for (size_t i = 0; i < P.size() - 2; i++)
                 for (size_t j = i + 1; j < P.size(); j++)
                         for (size_t k = j + 1; k < P.size(); k++) {
@@ -15938,13 +15771,10 @@ using std::cin;
 using std::cout;
 using std::vector;
 
-/*! shorthand definition for `int64_t` */
 #define ll int64_t
 
-/*! shorthand definition for `std::endl` */
 #define endl std::endl
 
-/*! shorthand definition for `int64_t` */
 #define pb push_back
 #define MOD 1000000007
 
@@ -15980,10 +15810,6 @@ vector<vector<ll>> power(const vector<vector<ll>> &A, ll p) {
     }
 }
 
-/*! Wrapper for Fibonacci
- * \param[in] n \f$n^\text{th}\f$ Fibonacci number
- * \return \f$n^\text{th}\f$ Fibonacci number
- */
 ll ans(ll n) {
     if (n == 0)
         return 0;
@@ -16431,13 +16257,7 @@ static void test6(others::iterative_tree_traversals::BinaryTree binaryTree,
 
 
 int main() {
-        /*
-              1
-            /   \
-           2     3
-         /   \
-        4     5
-    */
+
 
     others::iterative_tree_traversals::BinaryTree
         binaryTree;                           others::iterative_tree_traversals::Node *root = binaryTree.createNewNode(1);
@@ -16569,7 +16389,8 @@ int main() {
         }
     }
 
-    /*for(i=0;i<m;i++)
+    
+    for(i=0;i<m;i++)
         {
             for(j=0;j<n;j++)
                 cout<<a[i][j]<<" ";
@@ -16591,7 +16412,7 @@ int main() {
     cout << str1 << "\n";
     cout << str2 << "\n";
 
-    cout << "longest string size = " << ma /*<<" "<<indi<<" "<<indj*/ << "\n";
+    cout << "longest string size = " << ma << "\n";
     for (i = indi - 3; i < indi; i++) cout << str1[i];
     cout << "\n";
 }
@@ -16687,18 +16508,6 @@ int main() {
 
     return 0;
 }
-/* Given two strings str1 & str2
- * and below operations that can
- * be performed on str1. Find
- * minimum number of edits
- * (operations) required to convert
- * 'str1' into 'str2'/
- * a. Insert
- * b. Remove
- * c. Replace
- * All of the above operations are
- * of equal cost
- */
 
 #include <iostream>
 #include <string>
@@ -16706,11 +16515,7 @@ using namespace std;
 
 int min(int x, int y, int z) { return min(min(x, y), z); }
 
-/* A Naive recursive C++ program to find
- * minimum number of operations to convert
- * str1 to str2.
- * O(3^m)
- */
+
 int editDist(string str1, string str2, int m, int n) {
     if (m == 0)
         return n;
@@ -16725,9 +16530,6 @@ int editDist(string str1, string str2, int m, int n) {
                    editDist(str1, str2, m - 1, n - 1));
 }
 
-/* A DP based program
- * O(m x n)
- */
 int editDistDP(string str1, string str2, int m, int n) {
         int dp[m + 1][n + 1];
 
@@ -16771,16 +16573,11 @@ int main() {
 
     temp = n;
 
-    /* First Count the number of digits
-       in the given number */
     while (temp != 0) {
         temp /= 10;
         count++;
     }
 
-    /* Calaculation for checking of armstrongs number i.e.
-       in a n digit number sum of the digits raised to a power of n
-       is equal to the original number */
 
     temp = n;
     while (temp != 0) {
@@ -16892,39 +16689,7 @@ int main() {
         test();
     return 0;
 }
-/*
- *this program is use to find any elemet in any row with variable array size
- *aplication of pointer is use in it
- *important point start from here to:
- *the index value of array can be go to 1 to 100000
- *check till array[1000]
- *end here
- *how to work example:
- **Question:
- ***number of array 2
- ***quarry 3
- ***array 1 is {1 2 3 4 5}
- ***array 2 is {6 7}
- ****i) what is 2nd element in 1st array
- ****ii) what is 1st element in 2nd array
- ****iii) what is 5th element in 1st array
- *****output:
- *****Enter Number of array you want to Store : 2
- *****Enter Number of Question or Quary you want to do Related to Array : 3
- *****Enter number of element in 1 rows : 5
- *****Enter the element of Array 1 2 3 4 5
- *****Enter number of element in 2 rows : 2
- *****Enter the element of Array 6 7
- *****enter the number of row which element You want to find : 1
- *****enter the position of element which You want to find : 2
- *****The element is 2
- *****enter the number of row which element You want to find : 2
- *****enter the position of element which You want to find : 1
- *****The element is 6
- *****enter the number of row which element You want to find : 1
- *****enter the position of element which You want to find : 5
- *****The element is 5
- */
+
 #include <iostream>
 
 int main() {
@@ -17181,23 +16946,6 @@ int main() {
               << std::endl;
 }
 
-/*
- * Given a rooted tree with node 1.
- * Task is to find the height of the tree.
- * Example: -
- * 4
- * 1 2
- * 1 3
- * 2 4
- * which can be represented as
- *   1
- *  / \
- * 2   3
- * |
- * 4
- *
- * Height of the tree : - 2
- */
 
 #include <iostream>
 #include <vector>
@@ -17960,9 +17708,7 @@ int main(int argc, char const* argv[]) {
     cout << LIS(a, n) << endl;
     return 0;
 }
-/* Function to get minimun number of trials needed
- * in worst case with n eggs and k floors
- */
+
 
 #include <climits>
 #include <iostream>
@@ -18297,12 +18043,7 @@ int main() {
         }
         std::cout << std::endl;
     }
-    /*add(1,&head1);
-    add(2,&head1);
-    add(3,&head2);
-    add(5,&head1);
-    display(&head1);
-    display(&head2);*/
+
     return 0;
 }
 
@@ -19526,11 +19267,7 @@ double Sqrt(double a) {
         return 1 / Sqrt(1 / a);
     }
     double l = 0, r = a;
-    /* Epsilon is the precision.
-    A great precision is
-    between 1e-7 and 1e-12.
-    double epsilon = 1e-12;
-    */
+
     double epsilon = 1e-12;
     while (l <= r) {
         double mid = (l + r) / 2;
@@ -20357,13 +20094,11 @@ int main() {
 
 
 uint64_t fibonacci(uint64_t n) {
-    /* If the input is 0 or 1 just return the same
-       This will set the first 2 values of the sequence */
+
     if (n <= 1) {
         return n;
     }
 
-    /* Add the last 2 values of the sequence to get next */
     return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
@@ -20654,7 +20389,6 @@ T Standard_InvSqrt(T number) {
 static void test() {
     const float epsilon = 1e-3f;
 
-    /* Tests with multiple values */
     assert(std::fabs(Standard_InvSqrt<float>(100.0f) - 0.0998449f) < epsilon);
     assert(std::fabs(Standard_InvSqrt<double>(36.0f) - 0.166667f) < epsilon);
     assert(std::fabs(Standard_InvSqrt(12.0f) - 0.288423f) < epsilon);
@@ -20920,18 +20654,7 @@ T get_nth_term_of_recurrence_series(
 }  }  
 
 static void test() {
-    /*
-     * Example 1: [Fibonacci
-     * series](https:     *
-     * [fn-2    fn-1]  [0      1]  ==   [fn-1   (fn-2 + fn-1)] => [fn-1   fn]
-     *                 [1      1]
-     *
-     * Let A = [fn-2   fn-1], and B = [0   1]
-     *                                [1   1],
-     *
-     * Since, A.B....(n-1 times) = [fn-1   fn]
-     * we can multiply B with itself n-1 times to obtain the required value
-     */
+
     std::vector<std::vector<int64_t>> fibonacci_matrix = {{0, 1}, {1, 1}},
                                       fib_base_case = {{0, 1}};
 
@@ -20939,20 +20662,6 @@ static void test() {
                fibonacci_matrix, fib_base_case, 11) == 89LL);
     assert(math::linear_recurrence_matrix::get_nth_term_of_recurrence_series(
                fibonacci_matrix, fib_base_case, 39) == 63245986LL);
-    /*
-     * Example 2: [Tribonacci series](https:     *                    [0   0   1]
-     * [fn-3  fn-2  fn-1] [1   0   1]  =  [(fn-2)  (fn-1)  (fn-3 + fn-2 + fn-1)]
-     *                    [0   1   1]
-     *                                 => [fn-2     fn-1    fn]
-     *
-     *                                       [0   0   1]
-     * Let A = [fn-3   fn-2   fn-1], and B = [1   0   1]
-     *                                       [0   1   1]
-     *
-     * Since, A.B....(n-2 times) = [fn-2  fn-1   fn]
-     * we will have multiply B with itself n-2 times to obtain the required
-     * value ()
-     */
 
     std::vector<std::vector<int64_t>> tribonacci = {{0, 0, 1},
                                                     {1, 0, 1},
@@ -20964,16 +20673,6 @@ static void test() {
     assert(math::linear_recurrence_matrix::get_nth_term_of_recurrence_series(
                tribonacci, trib_base_case, 36) == 615693474LL);
 
-    /*
-     * Example 3: [Pell numbers](https:     * `f(n)  = 2* f(n-1) + f(n-2); f(0) = f(1) = 2`
-     *
-     * [fn-2  fn-1] [0   1]  =  [(fn-1)  fn-2 + 2*fn-1)]
-     *              [1   2]
-     *                       => [fn-1     fn]
-     *
-     * Let A = [fn-2  fn-1], and B = [0   1]
-     *                               [1   2]
-     */
 
     std::vector<std::vector<int64_t>> pell_recurrence = {{0, 1}, {1, 2}},
                                       pell_base_case = {
@@ -20983,26 +20682,6 @@ static void test() {
     assert(math::linear_recurrence_matrix::get_nth_term_of_recurrence_series(
                pell_recurrence, pell_base_case, 23) == 636562078LL);
 
-    /*
-     * Example 4: Custom recurrence relation:
-     * Now the recurrence is of the form `a*f(n-1) + b*(fn-2) + ... + c`
-     * where `c` is the constant
-     * `f(n)  = 2* f(n-1) + f(n-2) + 7; f(0) = f(1) = 2, c = 7`
-     *
-     *                   [1   0   1]
-     * [7,  fn-2,  fn-1] [0   0   1]
-     *                   [0   1   2]
-     * =  [7,  (fn-1),  fn-2 + 2*fn-1) + 7]
-     *
-     * => [7,    fn-1,     fn]
-     * :: Series will be 2, 2, 13, 35, 90, 222, 541, 1311, 3170, 7658, 18493,
-     * 44651, 107802, 260262, 628333, 1516935, 362210, 8841362, 21344941,
-     * 51531251
-     *
-     * Let A = [7,  fn-2,  fn-1], and B = [1   0   1]
-     *                                    [0   0   1]
-     *                                    [0   1   2]
-     */
 
     std::vector<std::vector<int64_t>>
         custom_recurrence = {{1, 0, 1}, {0, 0, 1}, {0, 1, 2}},
@@ -21012,29 +20691,7 @@ static void test() {
     assert(math::linear_recurrence_matrix::get_nth_term_of_recurrence_series(
                custom_recurrence, custom_base_case, 19, 1) == 51531251LL);
 
-    /*
-     * Example 5: Sum fibonacci sequence
-     * The following matrix evaluates the sum of first n fibonacci terms in
-     * O(27. log2(n)) time.
-     * `f(n) = f(n-1) + f(n-2); f(0) = 0, f(1) = 1`
-     *
-     *                           [1   0   0]
-     * [s(f, n-1),  fn-2,  fn-1] [1   0   1]
-     *                           [1   1   1]
-     *   => [(s(f, n-1)+f(n-2)+f(n-1)), (fn-1),  f(n-2)+f(n-1)]
-     *
-     *   => [s(f, n-1)+f(n),    fn-1,     fn]
-     *
-     *   => [s(f, n),    fn-1,     fn]
-     *
-     * Sum of first 20 fibonacci series:
-     * 0, 1, 2, 4, 7, 12, 20, 33, 54, 88, 143, 232, 376, 609, 986, 1596, 2583,
-     * 4180, 6764
-     *          f0  f1  s(f,1)
-     * Let A = [0    1    1], and B = [0   1   1]
-     *                                [1   1   1]
-     *                                [0   0   1]
-     */
+
 
     std::vector<std::vector<int64_t>> sum_fibo_recurrence = {{0, 1, 1},
                                                              {1, 1, 1},
@@ -21045,31 +20702,6 @@ static void test() {
                sum_fibo_recurrence, sum_fibo_base_case, 13, 1) == 609LL);
     assert(math::linear_recurrence_matrix::get_nth_term_of_recurrence_series(
                sum_fibo_recurrence, sum_fibo_base_case, 16, 1) == 2583LL);
-    /*
-     * Example 6: [Tribonacci sum series](https:     *                               [0   0   1   1]
-     * [fn-3  fn-2  fn-1  s(f, n-1)] [1   0   1   1]
-     *                               [0   1   1   1]
-     *                               [0   0   0   1]
-     *
-     * = [fn-2, fn-1, fn-3 + fn-2 + fn-1, (fn-3 + fn-2 + fn-1 + s(f, n-1))]
-     *
-     * => [fn-2, fn-1, fn,  fn + s(f, n-1)]
-     *
-     * => [fn-2, fn-1, fn, s(f, n)]
-     *
-     * Sum of the series is: 0, 0, 1, 2, 4, 8, 15, 28, 52, 96, 177, 326, 600,
-     * 1104, 2031, 3736, 6872, 12640, 23249, 42762
-     *
-     * Let A = [fn-3   fn-2   fn-1   s(f, n-1)], and
-     *     [0   0   1   1]
-     * B = [1   0   1   1]
-     *     [0   1   1   1]
-     *     [0   0   0   1]
-     *
-     * Since, A.B....(n-2 times) = [fn-2  fn-1   fn]
-     * we will have multiply B with itself n-2 times to obtain the required
-     * value
-     */
 
     std::vector<std::vector<int64_t>> tribonacci_sum = {{0, 0, 1, 1},
                                                         {1, 0, 1, 1},
@@ -21721,7 +21353,6 @@ static void test() {
     double integral = 0;
     double lower_bound = 0, upper_bound = 0;
 
-    /* \int_{-2}^{2} -x^2 + 4 dx */
     f = [&](double& x) { return -x * x + 4.0; };
 
     lower_bound = -2.0;
@@ -21745,7 +21376,6 @@ static void test() {
     std::cout << "This number should be close to 10.666666: " << integral
               << std::endl;
 
-    /* \int_{0}^{1} e^x dx */
     f = [&](double& x) { return std::exp(x); };
 
     lower_bound = 0.0;
@@ -21769,10 +21399,7 @@ static void test() {
     std::cout << "This number should be close to 1.7182818: " << integral
               << std::endl;
 
-    /* \int_{-\infty}^{\infty} sinc(x) dx, sinc(x) = sin(pi * x) / (pi * x)
-       This is a difficult integral because of its infinite domain.
-       Therefore, it may deviate largely from the expected result.
-    */
+
     f = [&](double& x) { return std::sin(M_PI * x) / (M_PI * x); };
 
     pdf = [&](double& x) {
@@ -21801,12 +21428,11 @@ bool test1() {
     std::cout << "---- Check 1\t";
     unsigned int i, number = 10;
     large_number result;
-    for (i = 2; i <= number; i++) /* Multiply every number from 2 thru N */
+    for (i = 2; i <= number; i++) 
         result *= i;
 
     const char *known_reslt = "3628800";
 
-    /* check 1 */
     if (strlen(known_reslt) != result.num_digits()) {
         std::cerr << "Result lengths dont match! " << strlen(known_reslt)
                   << " != " << result.num_digits() << std::endl;
@@ -21831,7 +21457,7 @@ bool test2() {
     std::cout << "---- Check 2\t";
     unsigned int i, number = 100;
     large_number result;
-    for (i = 2; i <= number; i++) /* Multiply every number from 2 thru N */
+    for (i = 2; i <= number; i++)
         result *= i;
 
     const char *known_reslt =
@@ -21839,7 +21465,7 @@ bool test2() {
         "9993229915608941463976156518286253697920827223758251185210916864000000"
         "000000000000000000";
 
-    /* check 1 */
+
     if (strlen(known_reslt) != result.num_digits()) {
         std::cerr << "Result lengths dont match! " << strlen(known_reslt)
                   << " != " << result.num_digits() << std::endl;
@@ -21873,7 +21499,7 @@ int main(int argc, char *argv[]) {
     large_number result;
 
     std::clock_t start_time = std::clock();
-    for (i = 2; i <= number; i++) /* Multiply every number from 2 thru N */
+    for (i = 2; i <= number; i++) 
         result *= i;
     std::clock_t end_time = std::clock();
     double time_taken =
@@ -23432,9 +23058,7 @@ int main() {
             std::cout << "search time = " << counter << std::endl;
         else
             std::cout << "no found!\n";
-        key = -1;          /* The test sample is returned as:
-         * data[0]:data[5]:data[15]:data[10]:search time = 3 The search is
-         * successful. There are 10 in this set of data */
+        key = -1;
     }
 
     return 0;
@@ -24238,7 +23862,6 @@ int LinearSearch(int *array, int size, int key)
         }
     }
 
-    /* We reach here only in case element is not present in array, return an invalid entry in that case*/
     return -1;
 }
 
@@ -26542,9 +26165,9 @@ namespace inversion {
 
 template <typename T>
 uint32_t merge(T* arr, T* temp, uint32_t left, uint32_t mid, uint32_t right) {
-    uint32_t i = left;       /* i --> index of left sub-array */
-    uint32_t j = mid + 1;    /* j --> index for right sub-array */
-    uint32_t k = left;       /* k --> index for resultant array temp */
+    uint32_t i = left;       
+    uint32_t j = mid + 1;   
+    uint32_t k = left;    
     uint32_t inv_count = 0;  
     while ((i <= mid) && (j <= right)) {
         if (arr[i] <= arr[j]) {
@@ -27011,7 +26634,6 @@ void bucketSort(float arr[], int n) {
     delete[] b;
 }
 
-/* Driver program to test above funtion */
 int main() {
     float arr[] = {0.897, 0.565, 0.656, 0.1234, 0.665, 0.3434};
     int n = sizeof(arr) / sizeof(arr[0]);
@@ -27165,7 +26787,6 @@ void test_int(const int NUM_DATA) {
     for (int i = 0; i < NUM_DATA; i++)
         data[i] = data2[i] = (std::rand() % range) - (range >> 1);
 
-    /* sort using our implementation */
     std::clock_t start = std::clock();
     shell_sort(data, NUM_DATA);
     std::clock_t end = std::clock();
@@ -27173,7 +26794,6 @@ void test_int(const int NUM_DATA) {
     std::cout << "Time spent sorting using shell_sort2: " << elapsed_time
               << "s\n";
 
-    /* sort using std::qsort */
     start = std::clock();
     std::qsort(data2, NUM_DATA, sizeof(data2[0]), compare<int>);
     end = std::clock();
@@ -27199,7 +26819,6 @@ void test_f(const int NUM_DATA) {
         data[i] = data2[i] = ((std::rand() % range) - (range >> 1)) / 100.;
     }
 
-    /* sort using our implementation */
     std::clock_t start = std::clock();
     shell_sort(data, NUM_DATA);
     std::clock_t end = std::clock();
@@ -27207,7 +26826,6 @@ void test_f(const int NUM_DATA) {
     std::cout << "Time spent sorting using shell_sort2: " << elapsed_time
               << "s\n";
 
-    /* sort using std::qsort */
     start = std::clock();
     std::qsort(data2, NUM_DATA, sizeof(data2[0]), compare<float>);
     end = std::clock();
@@ -27443,7 +27061,6 @@ int main() {
     test();
     return 0;
 }
-/* C++ implementation Odd Even Sort */
 #include <iostream>
 #include <vector>
 
@@ -27495,24 +27112,18 @@ int main() {
     return 0;
 }
 
-/* C++ Program for Bitonic Sort. Note that this program
-   works only when size of input is a power of 2. */
+
 
 #include <algorithm>
 #include <iostream>
 
-/*The parameter dir indicates the sorting direction, ASCENDING
-   or DESCENDING; if (a[i] > a[j]) agrees with the direction,
-   then a[i] and a[j] are interchanged.*/
+
 void compAndSwap(int a[], int i, int j, int dir) {
     if (dir == (a[i] > a[j]))
         std::swap(a[i], a[j]);
 }
 
-/*It recursively sorts a bitonic sequence in ascending order,
-  if dir = 1, and in descending order otherwise (means dir=0).
-  The sequence to be sorted starts at index position low,
-  the parameter cnt is the number of elements to be sorted.*/
+
 void bitonicMerge(int a[], int low, int cnt, int dir) {
     if (cnt > 1) {
         int k = cnt / 2;
@@ -27522,9 +27133,6 @@ void bitonicMerge(int a[], int low, int cnt, int dir) {
     }
 }
 
-/* This function first produces a bitonic sequence by recursively
-    sorting its two halves in opposite sorting orders, and then
-    calls bitonicMerge to make them in the same order */
 void bitonicSort(int a[], int low, int cnt, int dir) {
     if (cnt > 1) {
         int k = cnt / 2;
@@ -27537,8 +27145,7 @@ void bitonicSort(int a[], int low, int cnt, int dir) {
     }
 }
 
-/* Caller of bitonicSort for sorting the entire array of
-   length N in ASCENDING order */
+
 void sort(int a[], int N, int up) { bitonicSort(a, 0, N, up); }
 
 int main() {
@@ -27861,10 +27468,7 @@ int main() {
     for (int i = 0; i < n_ex; i++) std::cout << index_ex[i] << " ";
     std::cout << std::endl;
 
-    /* --output--
-    sorted array :
-    -12 -8 -6 0 1 1 1 4 5 9 9
-    */
+
 }
 
 
@@ -27907,33 +27511,28 @@ void insertionSort_binsrch(std::vector<T> &arr) {
 }  
 
 static void test() {
-    /* descriptions of the following test */
-    /* 1st test:
-       [5, -3, -1, -2, 7] returns [-3, -2, -1, 5, 7] */
+
     std::vector<int64_t> arr1({5, -3, -1, -2, 7});
     std::cout << "1st test... ";
     sorting::insertionSort_binsrch(arr1);
     assert(std::is_sorted(std::begin(arr1), std::end(arr1)));
     std::cout << "passed" << std::endl;
 
-    /* 2nd test:
-       [12, 26, 15, 91, 32, 54, 41] returns [12, 15, 26, 32, 41, 54, 91] */
+   
     std::vector<int64_t> arr2({12, 26, 15, 91, 32, 54, 41});
     std::cout << "2nd test... ";
     sorting::insertionSort_binsrch(arr2);
     assert(std::is_sorted(std::begin(arr2), std::end(arr2)));
     std::cout << "passed" << std::endl;
 
-    /* 3rd test:
-       [7.1, -2.5, -4.0, -2.1, 5.7] returns [-4.0, -2.5, -2.1, 5.7, 7.1] */
+
     std::vector<float> arr3({7.1, -2.5, -4.0, -2.1, 5.7});
     std::cout << "3rd test... ";
     sorting::insertionSort_binsrch(arr3);
     assert(std::is_sorted(std::begin(arr3), std::end(arr3)));
     std::cout << "passed" << std::endl;
 
-    /* 4th test:
-       [12.8, -3.7, -20.7, -7.1, 2.2] returns [-20.7, -7.1, -3.7, 2.2, 12.8] */
+   
     std::vector<float> arr4({12.8, -3.7, -20.7, -7.1, 2.2});
     std::cout << "4th test... ";
     sorting::insertionSort_binsrch(arr4);
@@ -28116,7 +27715,7 @@ namespace sorting {
         template <typename T>
         std::list<T> strand_sort(std::list<T> lst) {
             if (lst.size() < 2) {                 return lst;             }
-            std::list<T> result;             std::list<T> sorted;             while(!lst.empty()) /* if lst is not empty */ {
+            std::list<T> result;             std::list<T> sorted;             while(!lst.empty())  {
                 sorted.push_back(lst.front());                 lst.pop_front();                 for (auto it = lst.begin(); it != lst.end(); ) {                     if (sorted.back() <= *it) {                         sorted.push_back(*it);                         it = lst.erase(it);                     } else {
                         it++;                     }
                 }
